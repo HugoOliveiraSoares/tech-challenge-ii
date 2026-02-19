@@ -5,7 +5,7 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.dto.ListRestaurantOutput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.ListRestaurants;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.filter.RestaurantSearchFilter;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.RestaurantOutputMapper;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.ListRestaurantOutputMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class ListRestaurantsImpl implements ListRestaurants {
                 .orElse(List.of());
 
         return restaurants.stream()
-                .map(RestaurantOutputMapper::from)
+                .map(ListRestaurantOutputMapper::from)
                 .toList();
     }
 }
