@@ -16,5 +16,4 @@ public interface RestaurantGateway {
     Restaurant update(Restaurant restaurant);
 
     void deleteById(Long id);
-
 }
