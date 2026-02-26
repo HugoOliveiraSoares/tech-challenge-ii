@@ -8,5 +8,5 @@ public record MenuItemDTO(
         BigDecimal price,
         boolean isOnlyLocalConsuption,
         String photoPath,
-        String restaurantId) {
+        Long restaurantId) {
 }
