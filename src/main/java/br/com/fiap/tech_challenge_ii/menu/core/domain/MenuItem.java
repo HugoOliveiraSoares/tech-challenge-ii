@@ -2,6 +2,7 @@ package br.com.fiap.tech_challenge_ii.menu.core.domain;
 
 import java.math.BigDecimal;
 
+import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemDTO;
 import lombok.Getter;
 
 @Getter
@@ -34,6 +35,16 @@ public class MenuItem {
         this.setOnlyLocalConsuption(isOnlyLocalConsuption);
         this.setPhotoPath(photoPath);
         this.setRestaurantId(restaurantId);
+    }
+
+    public MenuItemDTO toDTO() {
+        return new MenuItemDTO(
+                this.name,
+                this.description,
+                this.price,
+                this.isOnlyLocalConsuption,
+                this.photoPath,
+                this.restaurantId);
     }
 
     private void setId(Long id) {
