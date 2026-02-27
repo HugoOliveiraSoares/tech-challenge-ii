@@ -24,8 +24,10 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
                 .map(newItem -> {
                     menuItemGateway
                             .findByMenuItemNameAndRestaurantId(newItem.name(), newItem.restaurantId())
-                            .orElseThrow(() -> new ExistingMenuItemException(
-                                    "Item with name '%s' already exists".formatted(newItem.name())));
+                            .ifPresent(existing -> {
+                                throw new ExistingMenuItemException(
+                                        "Item with name '%s' already exists".formatted(newItem.name()));
+                            });
 
                     MenuItem itemSaved = menuItemGateway.save(new MenuItem(
                             newItem.name(),
