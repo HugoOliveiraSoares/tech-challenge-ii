@@ -6,6 +6,8 @@ import java.util.List;
 import br.com.fiap.tech_challenge_ii.user.core.domain.Restaurant;
 import br.com.fiap.tech_challenge_ii.user.core.domain.valueObjects.Address;
 
+
+
 public class Owner extends User {
 
     List<Restaurant> restaurants;
