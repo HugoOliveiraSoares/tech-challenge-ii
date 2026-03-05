@@ -12,7 +12,7 @@ public class GetRestaurantByIdImpl implements GetRestaurantById {
     public GetRestaurantByIdImpl(RestaurantGateway restaurantGateway) {this.restaurantGateway = restaurantGateway;}
 
     @Override
-    public GetRestaurantOutput getRestaurantById(Long id) {
+    public GetRestaurantOutput getById(Long id) {
         var restaurantById = restaurantGateway.findById(id)
                 .orElseThrow(() -> new NotFoundException("Restaurant with id %s not found".formatted(id)));
 

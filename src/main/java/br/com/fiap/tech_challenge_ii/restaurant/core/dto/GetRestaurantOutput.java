@@ -1,8 +1,10 @@
 package br.com.fiap.tech_challenge_ii.restaurant.core.dto;
 
-public record GetRestaurantOutput(String name,
-                                  AddressDTO address,
-                                  String kitchenType,
-                                  WeeklyScheduleDTO openingHours
-) {
+import br.com.fiap.tech_challenge_ii.restaurant.core.domain.KitchenType;
+
+public record GetRestaurantOutput(Long id,
+                                  String name,
+                                  AddressDTO addressDTO,
+                                  KitchenType kitchenType,
+                                  String openingHours) {
 }
