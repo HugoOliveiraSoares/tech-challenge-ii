@@ -14,7 +14,7 @@ import lombok.Setter;
 import lombok.AllArgsConstructor;
 
 @Entity
-@Table(name = "menu_items")
+@Table(name = "menu_item")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,7 +34,7 @@ public class MenuItemEntity {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "only_local_consumption")
     private Boolean isOnlyLocalConsumption;
 
     @Column(nullable = false)
