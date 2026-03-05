@@ -3,12 +3,11 @@ package br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.KitchenType;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.Restaurant;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.Address;
-import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.WeeklySchedule;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantOutput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurant;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.WeeklyScheduleMapper;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.CreateRestaurantOutputMapper;
 
 public class CreateRestaurantImpl implements CreateRestaurant {
     private final RestaurantGateway restaurantGateway;
@@ -19,7 +18,8 @@ public class CreateRestaurantImpl implements CreateRestaurant {
 
     @Override
     public CreateRestaurantOutput create(CreateRestaurantInput restaurantInput) {
-        var newAddress = Address.newAddress(restaurantInput.address().street(),
+        var newAddress = Address.newAddress(null,
+                restaurantInput.address().street(),
                 restaurantInput.address().number(),
                 restaurantInput.address().neighborhood(),
                 restaurantInput.address().city(),
@@ -27,17 +27,20 @@ public class CreateRestaurantImpl implements CreateRestaurant {
 
         var kitchenType = KitchenType.valueOf(restaurantInput.kitchenType().trim().toUpperCase());
 
-        WeeklySchedule weekSchedule = WeeklyScheduleMapper.from(restaurantInput.weeklyScheduleDTO());
+        //FIXME:
+//        WeeklySchedule weekSchedule = WeeklyScheduleMapper.from(restaurantInput.weeklyScheduleDTO());
 
         //TODO: validate user type owner
 
-        var newRestaurant = Restaurant.newRestaurant(restaurantInput.name(),
+        var newRestaurant = Restaurant.newRestaurant(null,
+                restaurantInput.name(),
                 newAddress,
                 kitchenType,
-                weekSchedule,
+//                weekSchedule,
+                restaurantInput.openingHours(),
                 restaurantInput.ownerId());
 
         var restaurant = restaurantGateway.create(newRestaurant);
-        return CreateRestaurantOutput.from(restaurant);
+        return CreateRestaurantOutputMapper.from(restaurant);
     }
 }
