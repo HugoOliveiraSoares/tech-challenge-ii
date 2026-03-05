@@ -3,6 +3,7 @@ package br.com.fiap.tech_challenge_ii.restaurant.core.dto;
 public record CreateRestaurantInput(String name,
                                     AddressDTO address,
                                     String kitchenType,
-                                    WeeklyScheduleDTO weeklyScheduleDTO,
+//                                    WeeklyScheduleDTO weeklyScheduleDTO,
+                                    String openingHours,
                                     Long ownerId) {
 }
