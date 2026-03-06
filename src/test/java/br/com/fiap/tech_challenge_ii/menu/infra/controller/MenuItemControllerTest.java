@@ -22,13 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemRequestDTO;
+import br.com.fiap.tech_challenge_ii.menu.infra.controller.dto.MenuItemRequestDTO;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Sql(scripts = "/sql/menu.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, config = @SqlConfig(transactionMode = TransactionMode.ISOLATED))
 public class MenuItemControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -59,6 +58,7 @@ public class MenuItemControllerTest {
                         "/images/suco.jpg", 1L));
 
         mockMvc.perform(post("/menu")
+                .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
                 .andDo(print())
@@ -67,11 +67,39 @@ public class MenuItemControllerTest {
     }
 
     @Test
+    void shouldReturnForbiddenWhenNotOwner() throws Exception {
+        List<MenuItemRequestDTO> items = List.of(
+                new MenuItemRequestDTO("Picanha", "Delicious beef", new BigDecimal("59.90"), false,
+                        "/images/picanha.jpg", 1L));
+
+        mockMvc.perform(post("/menu")
+                        .header("x-user-id", 2L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(items)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturnBadRequestForMissingUserId() throws Exception {
+        List<MenuItemRequestDTO> items = List.of(
+                new MenuItemRequestDTO("Picanha", "Delicious beef", new BigDecimal("59.90"), false,
+                        "/images/picanha.jpg", 1L));
+
+        mockMvc.perform(post("/menu")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(items)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void shouldReturnBadRequestForMissingName() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
                 new MenuItemRequestDTO("", "Description", new BigDecimal("10.00"), false, null, 1L));
 
         mockMvc.perform(post("/menu")
+                .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
                 .andDo(print())
@@ -84,6 +112,7 @@ public class MenuItemControllerTest {
                 new MenuItemRequestDTO("Test Item", "Description", null, false, null, 1L));
 
         mockMvc.perform(post("/menu")
+                .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
                 .andDo(print())
@@ -96,6 +125,7 @@ public class MenuItemControllerTest {
                 new MenuItemRequestDTO("Test Item", "Description", new BigDecimal("-10.00"), false, null, 1L));
 
         mockMvc.perform(post("/menu")
+                .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
                 .andDo(print())
@@ -108,6 +138,7 @@ public class MenuItemControllerTest {
                 new MenuItemRequestDTO("Feijoada", "Traditional dish", new BigDecimal("45.90"), false, null, 1L));
 
         mockMvc.perform(post("/menu")
+                .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
                 .andDo(print())

@@ -3,9 +3,7 @@ package br.com.fiap.tech_challenge_ii.menu.core.usecase.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,9 +20,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.fiap.tech_challenge_ii.menu.core.domain.MenuItem;
+import br.com.fiap.tech_challenge_ii.menu.core.domain.valueObjects.Restaurant;
+import br.com.fiap.tech_challenge_ii.menu.core.domain.valueObjects.User;
 import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemDTO;
 import br.com.fiap.tech_challenge_ii.menu.core.exception.ExistingMenuItemException;
+import br.com.fiap.tech_challenge_ii.menu.core.exception.RestaurantNotFoundException;
+import br.com.fiap.tech_challenge_ii.menu.core.exception.UnauthorizedException;
+import br.com.fiap.tech_challenge_ii.menu.core.exception.UserNotFoundException;
 import br.com.fiap.tech_challenge_ii.menu.core.gateway.MenuItemGateway;
+import br.com.fiap.tech_challenge_ii.menu.core.gateway.RestaurantGateway;
+import br.com.fiap.tech_challenge_ii.menu.core.gateway.UserGateway;
 
 @ExtendWith(MockitoExtension.class)
 class CreateMenuItemUseCaseImplTest {
@@ -32,11 +37,17 @@ class CreateMenuItemUseCaseImplTest {
     @Mock
     private MenuItemGateway menuItemGateway;
 
+    @Mock
+    private RestaurantGateway restaurantGateway;
+
+    @Mock
+    private UserGateway userGateway;
+
     @InjectMocks
     private CreateMenuItemUseCaseImpl createMenuItemUseCase;
 
     @Test
-    void save_shouldCreateMenuItem_whenItemDoesNotExist() {
+    void save_shouldCreateMenuItem_whenItemDoesNotExistAndUserIsOwner() {
         MenuItemDTO dto = new MenuItemDTO(
                 "Burger",
                 "Delicious burger",
@@ -44,6 +55,9 @@ class CreateMenuItemUseCaseImplTest {
                 false,
                 "/photos/burger.jpg",
                 1L);
+
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", 1L);
+        User user = new User(1L, "Test User");
 
         MenuItem savedMenuItem = new MenuItem(
                 1L,
@@ -54,15 +68,62 @@ class CreateMenuItemUseCaseImplTest {
                 "/photos/burger.jpg",
                 1L);
 
+        when(userGateway.findUserById(1L)).thenReturn(Optional.of(user));
+        when(restaurantGateway.findRestaurantById(1L)).thenReturn(Optional.of(restaurant));
         when(menuItemGateway.findByMenuItemNameAndRestaurantId(eq("Burger"), eq(1L)))
                 .thenReturn(Optional.empty());
         when(menuItemGateway.save(any(MenuItem.class))).thenReturn(savedMenuItem);
 
-        List<Long> result = createMenuItemUseCase.save(List.of(dto));
+        List<Long> result = createMenuItemUseCase.save(List.of(dto), 1L);
 
         assertEquals(1, result.size());
         assertEquals(1L, result.get(0));
         verify(menuItemGateway, times(1)).save(any(MenuItem.class));
+    }
+
+    @Test
+    void save_shouldThrowUnauthorizedException_whenUserIsNotOwner() {
+        MenuItemDTO dto = new MenuItemDTO(
+                "Burger",
+                "Delicious burger",
+                new BigDecimal("25.90"),
+                false,
+                "/photos/burger.jpg",
+                1L);
+
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", 1L);
+        User user = new User(999L, "Other User");
+
+        when(userGateway.findUserById(999L)).thenReturn(Optional.of(user));
+        when(restaurantGateway.findRestaurantById(1L)).thenReturn(Optional.of(restaurant));
+
+        UnauthorizedException exception = assertThrows(
+                UnauthorizedException.class,
+                () -> createMenuItemUseCase.save(List.of(dto), 999L));
+
+        assertEquals("User is not the owner of this restaurant", exception.getMessage());
+        verify(menuItemGateway, never()).save(any(MenuItem.class));
+    }
+
+    @Test
+    void save_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
+        MenuItemDTO dto = new MenuItemDTO(
+                "Burger",
+                "Delicious burger",
+                new BigDecimal("25.90"),
+                false,
+                "/photos/burger.jpg",
+                1L);
+
+        when(userGateway.findUserById(999L)).thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(
+                UserNotFoundException.class,
+                () -> createMenuItemUseCase.save(List.of(dto), 999L));
+
+        assertEquals("User with id '999' not found", exception.getMessage());
+        verify(menuItemGateway, never()).save(any(MenuItem.class));
+        verify(restaurantGateway, never()).findRestaurantById(any());
     }
 
     @Test
@@ -75,6 +136,9 @@ class CreateMenuItemUseCaseImplTest {
                 "/photos/burger.jpg",
                 1L);
 
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", 1L);
+        User user = new User(1L, "Test User");
+
         MenuItem existingItem = new MenuItem(
                 1L,
                 "Burger",
@@ -84,12 +148,14 @@ class CreateMenuItemUseCaseImplTest {
                 "/photos/burger.jpg",
                 1L);
 
+        when(userGateway.findUserById(1L)).thenReturn(Optional.of(user));
+        when(restaurantGateway.findRestaurantById(1L)).thenReturn(Optional.of(restaurant));
         when(menuItemGateway.findByMenuItemNameAndRestaurantId(eq("Burger"), eq(1L)))
                 .thenReturn(Optional.of(existingItem));
 
         ExistingMenuItemException exception = assertThrows(
                 ExistingMenuItemException.class,
-                () -> createMenuItemUseCase.save(List.of(dto)));
+                () -> createMenuItemUseCase.save(List.of(dto), 1L));
 
         assertEquals("Item with name 'Burger' already exists", exception.getMessage());
         verify(menuItemGateway, never()).save(any(MenuItem.class));
@@ -113,11 +179,16 @@ class CreateMenuItemUseCaseImplTest {
                 "/photos/pizza.jpg",
                 1L);
 
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", 1L);
+        User user = new User(1L, "Test User");
+
         MenuItem savedItem1 = new MenuItem(1L, "Burger", "Delicious burger",
                 new BigDecimal("25.90"), false, "/photos/burger.jpg", 1L);
         MenuItem savedItem2 = new MenuItem(2L, "Pizza", "Cheesy pizza",
                 new BigDecimal("45.90"), false, "/photos/pizza.jpg", 1L);
 
+        when(userGateway.findUserById(1L)).thenReturn(Optional.of(user));
+        when(restaurantGateway.findRestaurantById(1L)).thenReturn(Optional.of(restaurant));
         when(menuItemGateway.findByMenuItemNameAndRestaurantId(eq("Burger"), eq(1L)))
                 .thenReturn(Optional.empty());
         when(menuItemGateway.findByMenuItemNameAndRestaurantId(eq("Pizza"), eq(1L)))
@@ -126,7 +197,7 @@ class CreateMenuItemUseCaseImplTest {
                 .thenReturn(savedItem1)
                 .thenReturn(savedItem2);
 
-        List<Long> result = createMenuItemUseCase.save(List.of(dto1, dto2));
+        List<Long> result = createMenuItemUseCase.save(List.of(dto1, dto2), 1L);
 
         assertEquals(2, result.size());
         assertEquals(1L, result.get(0));
@@ -136,28 +207,32 @@ class CreateMenuItemUseCaseImplTest {
 
     @Test
     void save_shouldReturnEmptyList_whenInputListIsEmpty() {
-        List<Long> result = createMenuItemUseCase.save(List.of());
+        List<Long> result = createMenuItemUseCase.save(List.of(), 1L);
 
         assertEquals(0, result.size());
+        verify(userGateway, never()).findUserById(any());
+        verify(restaurantGateway, never()).findRestaurantById(any());
         verify(menuItemGateway, never()).findByMenuItemNameAndRestaurantId(any(), any());
         verify(menuItemGateway, never()).save(any(MenuItem.class));
     }
 
     @Test
-    void save_shouldThrowIllegalArgumentException_whenRestaurantIdIsNull() {
+    void save_shouldThrowRestaurantNotFoundException_whenRestaurantNotFound() {
         MenuItemDTO dto = new MenuItemDTO(
                 "Burger",
                 "Delicious burger",
                 new BigDecimal("25.90"),
                 false,
                 "/photos/burger.jpg",
-                null);
+                999L);
 
-        when(menuItemGateway.findByMenuItemNameAndRestaurantId(anyString(), nullable(Long.class)))
-                .thenReturn(Optional.empty());
+        User user = new User(1L, "Test User");
 
-        assertThrows(IllegalArgumentException.class,
-                () -> createMenuItemUseCase.save(List.of(dto)));
+        when(userGateway.findUserById(1L)).thenReturn(Optional.of(user));
+        when(restaurantGateway.findRestaurantById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(RestaurantNotFoundException.class,
+                () -> createMenuItemUseCase.save(List.of(dto), 1L));
         verify(menuItemGateway, never()).save(any(MenuItem.class));
     }
 }
