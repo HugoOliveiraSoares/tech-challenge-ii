@@ -6,6 +6,6 @@ import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemDTO;
 
 public interface CreateMenuItemUseCase {
 
-    List<Long> save(List<MenuItemDTO> newMenuItens);
+    List<Long> save(List<MenuItemDTO> newMenuItens, Long userId);
 
 }
