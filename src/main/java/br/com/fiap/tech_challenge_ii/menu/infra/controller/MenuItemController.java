@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemDTO;
-import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemRequestDTO;
 import br.com.fiap.tech_challenge_ii.menu.core.usecase.CreateMenuItemUseCase;
 import br.com.fiap.tech_challenge_ii.menu.core.usecase.FindMenuItemUseCase;
+import br.com.fiap.tech_challenge_ii.menu.infra.controller.dto.MenuItemRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class MenuItemController {
 
     @PostMapping
     public ResponseEntity<Map<String, List<Long>>> createMenuItems(
+            @RequestHeader("x-user-id") Long userId,
             @Valid @RequestBody List<MenuItemRequestDTO> menuItems) {
 
         List<MenuItemDTO> menuItemDTOs = menuItems.stream()
@@ -43,7 +45,7 @@ public class MenuItemController {
                         req.restaurantId()))
                 .toList();
 
-        List<Long> ids = createMenuItemUseCase.save(menuItemDTOs);
+        List<Long> ids = createMenuItemUseCase.save(menuItemDTOs, userId);
 
         URI uri = URI.create("/menu");
         return ResponseEntity.created(uri).body(Map.of("ids", ids));
