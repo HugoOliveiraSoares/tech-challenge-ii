@@ -15,6 +15,10 @@ public class Restaurant {
         this.setOwnerId(ownerId);
     }
 
+    public boolean isOwnedBy(Long userId) {
+        return this.ownerId == userId;
+    }
+
     private void setId(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("The id can't be null");
