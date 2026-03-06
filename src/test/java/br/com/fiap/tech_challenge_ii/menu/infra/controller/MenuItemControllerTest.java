@@ -1,5 +1,6 @@
 package br.com.fiap.tech_challenge_ii.menu.infra.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -145,6 +146,17 @@ public class MenuItemControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Existing Menu Item"))
                 .andExpect(jsonPath("$.detail").value("Item with name 'Feijoada' already exists"));
+    }
+
+    @Test
+    void shouldReturnNoContentWhenDeleteMenuItem() throws Exception {
+
+        mockMvc.perform(delete("/menu/1/1")
+                .header("x-user-id", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
     }
 
 }
