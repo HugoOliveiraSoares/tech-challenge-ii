@@ -15,23 +15,26 @@ import java.util.Optional;
 public class RestaurantGatewayImpl implements RestaurantGateway {
 
     private final RestaurantJPARepository restaurantRepository;
-    private final RestaurantMapper restaurantMapper;
+    private final RestaurantMapper mapper;
 
     @Override
     public Restaurant create(Restaurant restaurant) {
-        var restaurantEntity = restaurantRepository.save(restaurantMapper.toEntity(restaurant));
+        var restaurantEntity = restaurantRepository.save(mapper.toEntity(restaurant));
 
-        return restaurantMapper.toDomain(restaurantEntity);
+        return mapper.toDomain(restaurantEntity);
     }
 
     @Override
     public List<Restaurant> findAll(RestaurantSearchFilter filter) {
-        return List.of();
+        return restaurantRepository.findByNameLikeIgnoreCase("%" + filter.name() + "%").stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
     public Optional<Restaurant> findById(Long id) {
-        return Optional.empty();
+        return restaurantRepository.findById(id)
+                .map(mapper::toDomain);
     }
 
     @Override
@@ -41,6 +44,5 @@ public class RestaurantGatewayImpl implements RestaurantGateway {
 
     @Override
     public void deleteById(Long id) {
-
     }
 }

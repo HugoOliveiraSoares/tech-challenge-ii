@@ -1,13 +1,7 @@
 package br.com.fiap.tech_challenge_ii.restaurant.infra.controller.mapper;
 
-import br.com.fiap.tech_challenge_ii.restaurant.core.dto.AddressDTO;
-import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
-import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantOutput;
-import br.com.fiap.tech_challenge_ii.restaurant.core.dto.GetRestaurantOutput;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.AddressJson;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantResponse;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.GetRestaurantResponse;
+import br.com.fiap.tech_challenge_ii.restaurant.core.dto.*;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,6 +27,12 @@ public class RestaurantMapper {
                 toAddressResponse(restaurant.addressDTO()),
                 restaurant.kitchenType(),
                 restaurant.openingHours());
+    }
+
+    public ListRestaurantResponse toResponse(ListRestaurantOutput restaurant) {
+        return new ListRestaurantResponse(restaurant.id(),
+                restaurant.name(),
+                restaurant.kitchenType());
     }
 
     private AddressDTO toAddressInput(AddressJson addressJson){
