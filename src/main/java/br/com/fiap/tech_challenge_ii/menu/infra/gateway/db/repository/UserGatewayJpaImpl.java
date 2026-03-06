@@ -1,0 +1,25 @@
+package br.com.fiap.tech_challenge_ii.menu.infra.gateway.db.repository;
+
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Component;
+
+import br.com.fiap.tech_challenge_ii.menu.core.domain.valueObjects.User;
+import br.com.fiap.tech_challenge_ii.menu.core.gateway.UserGateway;
+import br.com.fiap.tech_challenge_ii.menu.infra.gateway.db.mapper.UserMapper;
+
+@Component
+@RequiredArgsConstructor
+public class UserGatewayJpaImpl implements UserGateway {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    @Override
+    public Optional<User> findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .map(userMapper::toDomain);
+    }
+
+}
