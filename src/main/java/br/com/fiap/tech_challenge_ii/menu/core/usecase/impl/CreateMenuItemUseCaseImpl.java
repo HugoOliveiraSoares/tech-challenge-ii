@@ -30,9 +30,9 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
 
         return newMenuItens.stream()
                 .map(newItem -> {
-                    Restaurant restaurant = getRestaurant(newItem);
-
                     verifyIfUserExists(userId);
+
+                    Restaurant restaurant = getRestaurant(newItem);
 
                     if (!restaurant.isOwnedBy(userId)) {
                         throw new UnauthorizedException("User is not the owner of this restaurant");
