@@ -1,6 +1,7 @@
 package br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.NotFoundException;
+import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UnauthorizedOperationException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.DeleteRestaurantById;
 
@@ -12,11 +13,13 @@ public class DeleteRestaurantByIdImpl implements DeleteRestaurantById {
     }
 
     @Override
-    public void deleteRestaurantById(Long userId, Long restaurantId) {
+    public void deleteById(Long userId, Long restaurantId) {
         var restaurant = restaurantGateway.findById(restaurantId)
-                .orElseThrow(() -> new NotFoundException(""));
+                .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
-        //TODO: Check if logged user is restaurant owner
+        if(!restaurant.getOwnerId().equals(userId)) {
+            throw new UnauthorizedOperationException("User not authorized to delete this restaurant");
+        }
         restaurantGateway.deleteById(restaurantId);
     }
 }

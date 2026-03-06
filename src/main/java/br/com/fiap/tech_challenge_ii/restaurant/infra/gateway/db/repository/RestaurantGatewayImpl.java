@@ -44,5 +44,6 @@ public class RestaurantGatewayImpl implements RestaurantGateway {
 
     @Override
     public void deleteById(Long id) {
+        restaurantRepository.deleteById(id);
     }
 }

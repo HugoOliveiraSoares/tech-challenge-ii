@@ -2,9 +2,11 @@ package br.com.fiap.tech_challenge_ii.restaurant.infra.config;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurant;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.DeleteRestaurantById;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.GetRestaurantById;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.ListRestaurants;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl.CreateRestaurantImpl;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl.DeleteRestaurantByIdImpl;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl.GetRestaurantByIdImpl;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl.ListRestaurantsImpl;
 import org.springframework.context.annotation.Bean;
@@ -25,5 +27,10 @@ public class UseCaseConfig {
     @Bean
     public ListRestaurants listRestaurants(RestaurantGateway gateway) {
         return new ListRestaurantsImpl(gateway);
+    }
+
+    @Bean
+    public DeleteRestaurantById deleteRestaurantById(RestaurantGateway gateway) {
+        return new DeleteRestaurantByIdImpl(gateway);
     }
 }

@@ -2,6 +2,7 @@ package br.com.fiap.tech_challenge_ii.restaurant.infra.controller;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.filter.RestaurantSearchFilter;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurant;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.DeleteRestaurantById;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.GetRestaurantById;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.ListRestaurants;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
@@ -24,6 +25,7 @@ public class RestaurantController {
     private final CreateRestaurant createRestaurant;
     private final GetRestaurantById getRestaurantById;
     private final ListRestaurants listRestaurants;
+    private final DeleteRestaurantById deleteRestaurantById;
     private final RestaurantMapper mapper;
 
     @GetMapping("/{id}")
@@ -48,6 +50,15 @@ public class RestaurantController {
         var output = createRestaurant.create(mapper.toInput(request));
         URI uri = URI.create("/restaurants/" + output.id());
         return ResponseEntity.created(uri).body(mapper.toResponse(output));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long restaurantId){
+        //TODO: Get loggedUserId from JWT token
+        Long loggedUserId = 1L; //temporary
+        deleteRestaurantById.deleteById(loggedUserId, restaurantId);
+
+        return ResponseEntity.noContent().build();
     }
 }
 
