@@ -27,20 +27,13 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
 
         return newMenuItens.stream()
                 .map(newItem -> {
-                    Restaurant restaurant = restaurantGateway
-                            .findRestaurantById(newItem.restaurantId())
-                            .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
+                    Restaurant restaurant = getRestaurant(newItem);
 
-                    if (!restaurant.getOwnerId().equals(userId)) { // TODO: Verificar se o usuario existe
+                    if (!restaurant.isOwnedBy(userId)) {
                         throw new UnauthorizedException("User is not the owner of this restaurant");
                     }
 
-                    menuItemGateway
-                            .findByMenuItemNameAndRestaurantId(newItem.name(), newItem.restaurantId())
-                            .ifPresent(existing -> {
-                                throw new ExistingMenuItemException(
-                                        "Item with name '%s' already exists".formatted(newItem.name()));
-                            });
+                    verifyIfMenuItemAlreadyExists(newItem);
 
                     MenuItem itemSaved = menuItemGateway.save(new MenuItem(
                             newItem.name(),
@@ -52,6 +45,22 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
                     return itemSaved.getId();
                 })
                 .toList();
+    }
+
+    private void verifyIfMenuItemAlreadyExists(MenuItemDTO newItem) {
+        menuItemGateway
+                .findByMenuItemNameAndRestaurantId(newItem.name(), newItem.restaurantId())
+                .ifPresent(existing -> {
+                    throw new ExistingMenuItemException(
+                            "Item with name '%s' already exists".formatted(newItem.name()));
+                });
+    }
+
+    private Restaurant getRestaurant(MenuItemDTO newItem) {
+        Restaurant restaurant = restaurantGateway
+                .findRestaurantById(newItem.restaurantId())
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
+        return restaurant;
     }
 
 }
