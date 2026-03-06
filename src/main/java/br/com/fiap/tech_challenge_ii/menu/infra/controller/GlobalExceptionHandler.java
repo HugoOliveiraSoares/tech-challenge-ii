@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import br.com.fiap.tech_challenge_ii.menu.core.exception.ExistingMenuItemException;
 import br.com.fiap.tech_challenge_ii.menu.core.exception.NotFoundException;
+import br.com.fiap.tech_challenge_ii.menu.core.exception.UnauthorizedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -45,6 +46,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getDescription(false).replace("uri=", "")));
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    protected ResponseEntity<ProblemDetail> handleUnauthorizedException(UnauthorizedException ex,
+            final WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problemDetail.setType(URI.create("https://example.com/forbidden"));
+        problemDetail.setTitle("Forbidden");
+        problemDetail.setInstance(URI.create(
+                request.getDescription(false).replace("uri=", "")));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
     }
 
     @ExceptionHandler(value = { Exception.class })
