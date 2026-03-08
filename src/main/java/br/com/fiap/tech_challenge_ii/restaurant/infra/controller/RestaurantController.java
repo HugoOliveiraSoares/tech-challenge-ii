@@ -1,14 +1,8 @@
 package br.com.fiap.tech_challenge_ii.restaurant.infra.controller;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.filter.RestaurantSearchFilter;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurant;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.DeleteRestaurantById;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.GetRestaurantById;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.ListRestaurants;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantResponse;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.GetRestaurantResponse;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.ListRestaurantResponse;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.*;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.*;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.mapper.RestaurantMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -26,6 +20,7 @@ public class RestaurantController {
     private final GetRestaurantById getRestaurantById;
     private final ListRestaurants listRestaurants;
     private final DeleteRestaurantById deleteRestaurantById;
+    private final UpdateRestaurant updateRestaurant;
     private final RestaurantMapper mapper;
 
     @GetMapping("/{id}")
@@ -46,10 +41,20 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateRestaurantResponse> create(@Valid @RequestBody CreateRestaurantRequest request){
-        var output = createRestaurant.create(mapper.toInput(request));
+    public ResponseEntity<CreateRestaurantResponse> create(@Valid @RequestBody CreateRestaurantRequest input){
+        var output = createRestaurant.create(mapper.toInput(input));
         URI uri = URI.create("/restaurants/" + output.id());
         return ResponseEntity.created(uri).body(mapper.toResponse(output));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UpdateRestaurantResponse> update(@PathVariable("id") Long restaurantId,
+                                                           @Valid @RequestBody UpdateRestaurantRequest input){
+        //TODO: Get loggedUserId from JWT when Spring Security is implemented
+        Long loggedUserId = 1L;
+        var updatedRestaurant = updateRestaurant.update(loggedUserId, restaurantId, mapper.toInput(input));
+
+        return ResponseEntity.ok(mapper.toResponse(updatedRestaurant));
     }
 
     @DeleteMapping("/{id}")
