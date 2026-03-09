@@ -13,4 +13,8 @@ public interface MenuItemGateway {
 
     List<MenuItem> findByRestaurantId(Long restaurantId);
 
+    void delete(MenuItem menuItemId);
+
+    Optional<MenuItem> findById(Long menuId);
+
 }

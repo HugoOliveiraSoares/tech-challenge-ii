@@ -40,4 +40,15 @@ public class MenuItemGatewayImpl implements MenuItemGateway {
         return menuItemMapper.toDomain(savedEntity);
     }
 
+    @Override
+    public void delete(MenuItem menuItem) {
+        menuItemRepository.delete(menuItemMapper.toEntity(menuItem));
+    }
+
+    @Override
+    public Optional<MenuItem> findById(Long menuId) {
+        return menuItemRepository.findById(menuId)
+                .map(menuItemMapper::toDomain);
+    }
+
 }
