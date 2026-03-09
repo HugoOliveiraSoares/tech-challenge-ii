@@ -35,6 +35,21 @@ public class Restaurant {
         return new Restaurant(id, name, address, kitchenType, openingHours, ownerId);
     }
 
+    public void update(String name, Address address, KitchenType kitchenType, String openingHours) {
+        if(name != null){
+            renameTo(name);
+        }
+        if(address != null){
+            updateAddress(address);
+        }
+        if(kitchenType != null){
+            changeKitchenType(kitchenType);
+        }
+        if(openingHours != null){
+            changeOpeningHours(openingHours);
+        }
+    }
+
     private void renameTo(String newName) {
         if(newName == null || newName.isBlank())
             throw new DomainException("You need to inform the restaurant name!");

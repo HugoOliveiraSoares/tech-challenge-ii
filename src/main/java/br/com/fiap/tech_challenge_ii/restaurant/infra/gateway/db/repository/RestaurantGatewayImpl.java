@@ -39,7 +39,9 @@ public class RestaurantGatewayImpl implements RestaurantGateway {
 
     @Override
     public Restaurant update(Restaurant restaurant) {
-        return null;
+        var restaurantUpdated = restaurantRepository.save(mapper.toEntity(restaurant));
+
+        return mapper.toDomain(restaurantUpdated);
     }
 
     @Override

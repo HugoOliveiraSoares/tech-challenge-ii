@@ -19,9 +19,16 @@ public class RestaurantController {
     private final CreateRestaurant createRestaurant;
     private final GetRestaurantById getRestaurantById;
     private final ListRestaurants listRestaurants;
-    private final DeleteRestaurantById deleteRestaurantById;
     private final UpdateRestaurant updateRestaurant;
+    private final DeleteRestaurantById deleteRestaurantById;
     private final RestaurantMapper mapper;
+
+    @PostMapping
+    public ResponseEntity<CreateRestaurantResponse> create(@Valid @RequestBody CreateRestaurantRequest input){
+        var output = createRestaurant.create(mapper.toInput(input));
+        URI uri = URI.create("/restaurants/" + output.id());
+        return ResponseEntity.created(uri).body(mapper.toResponse(output));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<GetRestaurantResponse> getById(@PathVariable Long id){
@@ -38,13 +45,6 @@ public class RestaurantController {
                 .toList();
 
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping
-    public ResponseEntity<CreateRestaurantResponse> create(@Valid @RequestBody CreateRestaurantRequest input){
-        var output = createRestaurant.create(mapper.toInput(input));
-        URI uri = URI.create("/restaurants/" + output.id());
-        return ResponseEntity.created(uri).body(mapper.toResponse(output));
     }
 
     @PatchMapping("/{id}")
