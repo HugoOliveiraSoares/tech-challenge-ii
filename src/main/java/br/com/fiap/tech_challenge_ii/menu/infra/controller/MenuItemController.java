@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.tech_challenge_ii.menu.core.dto.MenuItemDTO;
 import br.com.fiap.tech_challenge_ii.menu.core.usecase.CreateMenuItemUseCase;
+import br.com.fiap.tech_challenge_ii.menu.core.usecase.DeleteMenuItemUseCase;
 import br.com.fiap.tech_challenge_ii.menu.core.usecase.FindMenuItemUseCase;
 import br.com.fiap.tech_challenge_ii.menu.infra.controller.dto.MenuItemRequestDTO;
 import jakarta.validation.Valid;
@@ -30,6 +31,7 @@ public class MenuItemController {
 
     private final CreateMenuItemUseCase createMenuItemUseCase;
     private final FindMenuItemUseCase findMenuItemUseCase;
+    private final DeleteMenuItemUseCase deleteMenuItemUseCase;
 
     @PostMapping
     public ResponseEntity<Map<String, List<Long>>> createMenuItems(
@@ -66,6 +68,8 @@ public class MenuItemController {
     public ResponseEntity<?> deleteMenuItem(
             @RequestHeader("x-user-id") Long userId,
             @PathVariable Long menuItemId) {
+
+        deleteMenuItemUseCase.delete(menuItemId, userId);
 
         return ResponseEntity.noContent().build();
     }
