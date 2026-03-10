@@ -6,7 +6,7 @@ import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.*;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RestaurantMapper {
+public class RestaurantControllerMapper {
 
     public CreateRestaurantInput toInput(CreateRestaurantRequest request) {
         return new CreateRestaurantInput(request.name(),

@@ -3,7 +3,7 @@ package br.com.fiap.tech_challenge_ii.restaurant.infra.controller;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.filter.RestaurantSearchFilter;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.*;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.*;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.mapper.RestaurantMapper;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.mapper.RestaurantControllerMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class RestaurantController {
     private final ListRestaurants listRestaurants;
     private final UpdateRestaurant updateRestaurant;
     private final DeleteRestaurantById deleteRestaurantById;
-    private final RestaurantMapper mapper;
+    private final RestaurantControllerMapper mapper;
 
     @PostMapping
     public ResponseEntity<CreateRestaurantResponse> create(@Valid @RequestBody CreateRestaurantRequest input){
@@ -58,7 +58,7 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long restaurantId){
+    public ResponseEntity<Void> deleteById(@PathVariable("id") Long restaurantId){
         //TODO: Get loggedUserId from JWT token
         Long loggedUserId = 1L; //temporary
         deleteRestaurantById.deleteById(loggedUserId, restaurantId);

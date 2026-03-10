@@ -7,7 +7,7 @@ import br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.entity.Restaura
 import org.springframework.stereotype.Component;
 
 @Component
-public class RestaurantMapper {
+public class RestaurantEntityMapper {
     public RestaurantEntity toEntity(Restaurant restaurant) {
         if (restaurant == null) {
             return null;

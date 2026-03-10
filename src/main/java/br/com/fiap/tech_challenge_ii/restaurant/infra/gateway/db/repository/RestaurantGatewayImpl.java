@@ -3,7 +3,7 @@ package br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.repository;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.Restaurant;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.filter.RestaurantSearchFilter;
-import br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.mapper.RestaurantMapper;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.mapper.RestaurantEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
 public class RestaurantGatewayImpl implements RestaurantGateway {
 
     private final RestaurantJPARepository restaurantRepository;
-    private final RestaurantMapper mapper;
+    private final RestaurantEntityMapper mapper;
 
     @Override
     public Restaurant create(Restaurant restaurant) {
