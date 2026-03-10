@@ -15,4 +15,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItemEntity, Long> 
 
     Optional<MenuItemEntity> findByNameAndRestaurantId(String name, Long restaurantId);
 
+    Optional<MenuItemEntity> findByNameAndRestaurantIdAndIdNot(String name, Long restaurantId, Long excludeId);
+
 }

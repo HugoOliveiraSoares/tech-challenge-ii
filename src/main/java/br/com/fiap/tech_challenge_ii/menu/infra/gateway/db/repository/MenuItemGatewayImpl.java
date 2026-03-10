@@ -51,4 +51,10 @@ public class MenuItemGatewayImpl implements MenuItemGateway {
                 .map(menuItemMapper::toDomain);
     }
 
+    @Override
+    public Optional<MenuItem> findByMenuItemNameAndRestaurantIdExcludingId(String name, Long restaurantId, Long excludeId) {
+        return menuItemRepository.findByNameAndRestaurantIdAndIdNot(name, restaurantId, excludeId)
+                .map(menuItemMapper::toDomain);
+    }
+
 }
