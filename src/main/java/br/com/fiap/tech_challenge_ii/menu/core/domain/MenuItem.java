@@ -94,4 +94,13 @@ public class MenuItem {
 
     }
 
+    public void update(String name, String description, BigDecimal price, boolean isOnlyLocalConsuption,
+            String photoPath) {
+        this.setName(name);
+        this.setDescription(description);
+        this.setPrice(price);
+        this.setOnlyLocalConsuption(isOnlyLocalConsuption);
+        this.setPhotoPath(photoPath);
+    }
+
 }
