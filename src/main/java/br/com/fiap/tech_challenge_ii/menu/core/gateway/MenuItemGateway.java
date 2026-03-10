@@ -17,4 +17,6 @@ public interface MenuItemGateway {
 
     Optional<MenuItem> findById(Long menuId);
 
+    Optional<MenuItem> findByMenuItemNameAndRestaurantIdExcludingId(String name, Long restaurantId, Long excludeId);
+
 }
