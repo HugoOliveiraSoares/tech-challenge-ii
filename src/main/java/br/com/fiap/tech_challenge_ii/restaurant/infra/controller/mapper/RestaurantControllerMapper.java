@@ -9,17 +9,29 @@ import org.springframework.stereotype.Component;
 public class RestaurantControllerMapper {
 
     public CreateRestaurantInput toInput(CreateRestaurantRequest request) {
+        var addressInput = request.address() == null
+                ? null
+                : toAddressInput(request.address()) ;
+
         return new CreateRestaurantInput(request.name(),
-                toAddressInput(request.address()),
+                addressInput,
                 request.kitchenType(),
                 request.openingHours(),
                 request.ownerId());
     }
 
     public UpdateRestaurantInput toInput(UpdateRestaurantRequest request) {
+        var addressInput = request.address() == null
+                ? null
+                : toAddressInput(request.address());
+
+        var kitchenTypeInput = request.kitchenType() == null
+                ? null
+                : KitchenType.valueOf(request.kitchenType());
+
         return new UpdateRestaurantInput(request.name(),
-                toAddressInput(request.address()),
-                KitchenType.valueOf(request.kitchenType()),
+                addressInput,
+                kitchenTypeInput,
                 request.openingHours());
     }
 
@@ -52,6 +64,8 @@ public class RestaurantControllerMapper {
     }
 
     private AddressDTO toAddressInput(AddressJson addressJson){
+        if(addressJson == null) return null;
+
         return new AddressDTO(addressJson.id(),
                 addressJson.street(),
                 addressJson.number(),
