@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class MenuItemGatewayImpl implements MenuItemGateway {
+public class MenuItemSpringDataGateway implements MenuItemGateway {
 
     private final MenuItemRepository menuItemRepository;
     private final MenuItemMapper menuItemMapper;

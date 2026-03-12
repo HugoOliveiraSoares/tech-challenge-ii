@@ -11,7 +11,7 @@ import br.com.fiap.tech_challenge_ii.menu.infra.gateway.db.mapper.UserMapper;
 
 @Component
 @RequiredArgsConstructor
-public class UserGatewayJpaImpl implements UserGateway {
+public class UserSpringDataGateway implements UserGateway {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;

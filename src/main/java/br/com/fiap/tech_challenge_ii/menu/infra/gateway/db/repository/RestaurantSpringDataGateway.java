@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class RestaurantGatewayImpl implements RestaurantGateway {
+public class RestaurantSpringDataGateway implements RestaurantGateway {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantMapper restaurantMapper;
