@@ -17,47 +17,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import br.com.fiap.tech_challenge_ii.menu.core.exception.ExistingMenuItemException;
-import br.com.fiap.tech_challenge_ii.menu.core.exception.NotFoundException;
-import br.com.fiap.tech_challenge_ii.menu.core.exception.UnauthorizedException;
+import br.com.fiap.tech_challenge_ii.menu.core.exception.SystemBaseException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ExistingMenuItemException.class)
-    protected ResponseEntity<ProblemDetail> handleExistingMenuItemException(ExistingMenuItemException ex,
-            final WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        problemDetail.setType(URI.create("https://example.com/bad-request"));
-        problemDetail.setTitle("Existing Menu Item");
-        problemDetail.setInstance(URI.create(
-                request.getDescription(false).replace("uri=", "")));
+    @ExceptionHandler(SystemBaseException.class)
+    protected ResponseEntity<ProblemDetail> handleSystemBaseException(SystemBaseException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatusCode.valueOf(ex.getHttpStatus()), ex.getMessage());
+        problemDetail.setType(URI.create("https://example.com/" + ex.getCode()));
+        problemDetail.setTitle(ex.getCode());
+        problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
+        problemDetail.setProperty("code", ex.getCode());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
-
-    }
-
-    @ExceptionHandler(value = { NotFoundException.class })
-    protected ResponseEntity<ProblemDetail> handleNotFound(final NotFoundException ex, final WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problemDetail.setType(URI.create("https://example.com/not-found"));
-        problemDetail.setTitle("Not Found");
-        problemDetail.setInstance(URI.create(
-                request.getDescription(false).replace("uri=", "")));
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    protected ResponseEntity<ProblemDetail> handleUnauthorizedException(UnauthorizedException ex,
-            final WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
-        problemDetail.setType(URI.create("https://example.com/forbidden"));
-        problemDetail.setTitle("Forbidden");
-        problemDetail.setInstance(URI.create(
-                request.getDescription(false).replace("uri=", "")));
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
+        return ResponseEntity.status(ex.getHttpStatus()).body(problemDetail);
     }
 
     @ExceptionHandler(value = { Exception.class })
