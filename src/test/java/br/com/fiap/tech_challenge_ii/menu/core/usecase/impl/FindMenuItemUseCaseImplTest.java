@@ -88,7 +88,7 @@ class FindMenuItemUseCaseImplTest {
                 RestaurantNotFoundException.class,
                 () -> findMenuItemUseCase.findByRestaurantId(restaurantId));
 
-        assertEquals("Can't find Restaurant whith this id: '999'", exception.getMessage());
+        assertEquals("Restaurant not found", exception.getMessage());
         verify(restaurantGateway, times(1)).findRestaurantById(restaurantId);
         verify(menuItemGateway, times(0)).findByRestaurantId(any());
     }

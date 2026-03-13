@@ -101,7 +101,7 @@ class CreateMenuItemUseCaseImplTest {
                 UnauthorizedException.class,
                 () -> createMenuItemUseCase.save(List.of(dto), 999L));
 
-        assertEquals("User is not the owner of this restaurant", exception.getMessage());
+        assertEquals("Action not allowed", exception.getMessage());
         verify(menuItemGateway, never()).save(any(MenuItem.class));
     }
 
@@ -121,7 +121,7 @@ class CreateMenuItemUseCaseImplTest {
                 UserNotFoundException.class,
                 () -> createMenuItemUseCase.save(List.of(dto), 999L));
 
-        assertEquals("User with id '999' not found", exception.getMessage());
+        assertEquals("User not found", exception.getMessage());
         verify(menuItemGateway, never()).save(any(MenuItem.class));
         verify(restaurantGateway, never()).findRestaurantById(any());
     }
@@ -157,7 +157,7 @@ class CreateMenuItemUseCaseImplTest {
                 ExistingMenuItemException.class,
                 () -> createMenuItemUseCase.save(List.of(dto), 1L));
 
-        assertEquals("Item with name 'Burger' already exists", exception.getMessage());
+        assertEquals("Item with this name already exists", exception.getMessage());
         verify(menuItemGateway, never()).save(any(MenuItem.class));
     }
 
