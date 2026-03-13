@@ -35,7 +35,7 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
                     Restaurant restaurant = getRestaurant(newItem);
 
                     if (!restaurant.isOwnedBy(userId)) {
-                        throw new UnauthorizedException("User is not the owner of this restaurant");
+                        throw new UnauthorizedException();
                     }
 
                     verifyIfMenuItemAlreadyExists(newItem);
@@ -56,20 +56,19 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
         menuItemGateway
                 .findByMenuItemNameAndRestaurantId(newItem.name(), newItem.restaurantId())
                 .ifPresent(existing -> {
-                    throw new ExistingMenuItemException(
-                            "Item with name '%s' already exists".formatted(newItem.name()));
+                    throw new ExistingMenuItemException();
                 });
     }
 
     private void verifyIfUserExists(Long userId) {
         userGateway.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id '%s' not found".formatted(userId)));
+                .orElseThrow(() -> new UserNotFoundException());
     }
 
     private Restaurant getRestaurant(MenuItemDTO newItem) {
         Restaurant restaurant = restaurantGateway
                 .findRestaurantById(newItem.restaurantId())
-                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
+                .orElseThrow(() -> new RestaurantNotFoundException());
         return restaurant;
     }
 

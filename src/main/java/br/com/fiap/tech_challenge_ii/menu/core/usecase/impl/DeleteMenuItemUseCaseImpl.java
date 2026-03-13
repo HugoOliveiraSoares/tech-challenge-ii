@@ -32,7 +32,7 @@ public class DeleteMenuItemUseCaseImpl implements DeleteMenuItemUseCase {
         Restaurant restaurant = getRestaurant(menuItemById.getRestaurantId());
 
         if (!restaurant.isOwnedBy(userId)) {
-            throw new UnauthorizedException("User is not the owner of this restaurant");
+            throw new UnauthorizedException();
         }
 
         menuItemGateway.delete(menuItemById);
@@ -42,20 +42,19 @@ public class DeleteMenuItemUseCaseImpl implements DeleteMenuItemUseCase {
     private MenuItem getMenuItemById(Long menuItemId) {
         return menuItemGateway.findById(menuItemId)
                 .orElseThrow(
-                        () -> new MenuItemNotFoundException("Menu Item with id '%s' not found".formatted(menuItemId)));
+                        () -> new MenuItemNotFoundException());
 
     }
 
     private void verifyIfUserExists(Long userId) {
         userGateway.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id '%s' not found".formatted(userId)));
+                .orElseThrow(() -> new UserNotFoundException());
     }
 
     private Restaurant getRestaurant(Long restaurantId) {
         Restaurant restaurant = restaurantGateway
                 .findRestaurantById(restaurantId)
-                .orElseThrow(() -> new RestaurantNotFoundException(
-                        "Restaurant with id '%s' not found".formatted(restaurantId)));
+                .orElseThrow(() -> new RestaurantNotFoundException());
         return restaurant;
     }
 

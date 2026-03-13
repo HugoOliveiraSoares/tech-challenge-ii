@@ -32,7 +32,7 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
         Restaurant restaurant = getRestaurantById(menuItem.getRestaurantId());
 
         if (!restaurant.isOwnedBy(userId)) {
-            throw new UnauthorizedException("User is not the owner of this restaurant");
+            throw new UnauthorizedException();
         }
 
         verifyDuplicateName(menuItemId, dto.name(), menuItem.getRestaurantId());
@@ -52,25 +52,23 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
     private void verifyDuplicateName(Long menuItemId, String newName, Long restaurantId) {
         menuItemGateway.findByMenuItemNameAndRestaurantIdExcludingId(newName, restaurantId, menuItemId)
                 .ifPresent(existing -> {
-                    throw new ExistingMenuItemException(
-                            "Item with name '%s' already exists".formatted(newName));
+                    throw new ExistingMenuItemException();
                 });
     }
 
     private MenuItem getMenuItemById(Long menuItemId) {
         return menuItemGateway.findById(menuItemId)
-                .orElseThrow(() -> new MenuItemNotFoundException(
-                        "Menu Item with id '%s' not found".formatted(menuItemId)));
+                .orElseThrow(() -> new MenuItemNotFoundException());
     }
 
     private void verifyIfUserExists(Long userId) {
         userGateway.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id '%s' not found".formatted(userId)));
+                .orElseThrow(() -> new UserNotFoundException());
     }
 
     private Restaurant getRestaurantById(Long restaurantId) {
         return restaurantGateway.findRestaurantById(restaurantId)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new RuntimeException());
     }
 
 }

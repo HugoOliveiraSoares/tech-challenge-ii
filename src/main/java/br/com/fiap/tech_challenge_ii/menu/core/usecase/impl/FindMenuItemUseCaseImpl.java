@@ -22,8 +22,7 @@ public class FindMenuItemUseCaseImpl implements FindMenuItemUseCase {
     @Override
     public List<MenuItemDTO> findByRestaurantId(Long restaurantId) {
         restaurantGateway.findRestaurantById(restaurantId)
-                .orElseThrow(() -> new RestaurantNotFoundException(
-                        "Can't find Restaurant whith this id: '%s'".formatted(restaurantId)));
+                .orElseThrow(() -> new RestaurantNotFoundException());
 
         return menuItemGateway.findByRestaurantId(restaurantId)
                 .stream()
