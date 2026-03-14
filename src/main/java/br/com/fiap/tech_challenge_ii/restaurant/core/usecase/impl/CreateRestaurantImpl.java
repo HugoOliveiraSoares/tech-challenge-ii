@@ -5,19 +5,28 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.domain.Restaurant;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.Address;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantOutput;
+import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UnauthorizedOperationException;
+import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UserNotFoundException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
+import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.UserGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurant;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.CreateRestaurantOutputMapper;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class CreateRestaurantImpl implements CreateRestaurant {
     private final RestaurantGateway restaurantGateway;
-
-    public CreateRestaurantImpl(RestaurantGateway restaurantGateway) {
-        this.restaurantGateway = restaurantGateway;
-    }
+    private final UserGateway userGateway;
 
     @Override
-    public CreateRestaurantOutput create(CreateRestaurantInput restaurantInput) {
+    public CreateRestaurantOutput create(Long userId, CreateRestaurantInput restaurantInput) {
+        var user = userGateway.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("There is no user with id %s".formatted(userId)));
+
+        if(!user.isOwner()) {
+            throw new UnauthorizedOperationException("You are not allowed to perform this operation");
+        }
+
         var newAddress = Address.newAddress(null,
                 restaurantInput.address().street(),
                 restaurantInput.address().number(),
@@ -27,18 +36,12 @@ public class CreateRestaurantImpl implements CreateRestaurant {
 
         var kitchenType = KitchenType.valueOf(restaurantInput.kitchenType().trim().toUpperCase());
 
-        //FIXME:
-//        WeeklySchedule weekSchedule = WeeklyScheduleMapper.from(restaurantInput.weeklyScheduleDTO());
-
-        //TODO: validate user type owner
-
         var newRestaurant = Restaurant.newRestaurant(null,
                 restaurantInput.name(),
                 newAddress,
                 kitchenType,
-//                weekSchedule,
                 restaurantInput.openingHours(),
-                restaurantInput.ownerId());
+                userId);
 
         var restaurant = restaurantGateway.create(newRestaurant);
         return CreateRestaurantOutputMapper.from(restaurant);

@@ -1,9 +1,9 @@
 package br.com.fiap.tech_challenge_ii.restaurant.core.gateway;
 
-import br.com.fiap.tech_challenge_ii.user.core.domain.User;
+import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.UserOwner;
 
 import java.util.Optional;
 
 public interface UserGateway {
-    Optional<User> getUserById(Long id);
+    Optional<UserOwner> getUserById(Long id);
 }
