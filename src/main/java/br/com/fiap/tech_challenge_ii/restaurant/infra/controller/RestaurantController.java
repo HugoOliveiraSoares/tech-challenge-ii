@@ -24,8 +24,10 @@ public class RestaurantController {
     private final RestaurantControllerMapper mapper;
 
     @PostMapping
-    public ResponseEntity<CreateRestaurantResponse> create(@Valid @RequestBody CreateRestaurantRequest input){
-        var output = createRestaurant.create(mapper.toInput(input));
+    public ResponseEntity<CreateRestaurantResponse> create(@RequestHeader("x-user-id") Long userId,
+            @Valid @RequestBody CreateRestaurantRequest input){
+
+        var output = createRestaurant.create(userId, mapper.toInput(input));
         URI uri = URI.create("/restaurants/" + output.id());
         return ResponseEntity.created(uri).body(mapper.toResponse(output));
     }

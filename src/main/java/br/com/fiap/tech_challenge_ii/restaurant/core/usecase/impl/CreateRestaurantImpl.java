@@ -24,7 +24,7 @@ public class CreateRestaurantImpl implements CreateRestaurant {
                 .orElseThrow(() -> new UserNotFoundException("There is no user with id %s".formatted(userId)));
 
         if(!user.isOwner()) {
-            throw new UnauthorizedOperationException("You are not allowed to perform this operation");
+            throw new UnauthorizedOperationException("Only users with OWNER role can create restaurants");
         }
 
         var newAddress = Address.newAddress(null,
