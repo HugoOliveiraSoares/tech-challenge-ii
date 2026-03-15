@@ -1,6 +1,5 @@
 package br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl;
 
-import br.com.fiap.tech_challenge_ii.restaurant.core.domain.KitchenType;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.Restaurant;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.Address;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
@@ -34,12 +33,10 @@ public class CreateRestaurantImpl implements CreateRestaurant {
                 restaurantInput.address().city(),
                 restaurantInput.address().zipCode());
 
-        var kitchenType = KitchenType.valueOf(restaurantInput.kitchenType().trim().toUpperCase());
-
         var newRestaurant = Restaurant.newRestaurant(null,
                 restaurantInput.name(),
                 newAddress,
-                kitchenType,
+                restaurantInput.kitchenType(),
                 restaurantInput.openingHours(),
                 userId);
 

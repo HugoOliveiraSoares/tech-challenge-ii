@@ -11,12 +11,11 @@ public class Restaurant {
     private String name;
     private Address address;
     private KitchenType kitchenType;
-//    private WeeklySchedule openingHours;
     private String openingHours;
-    private Long ownerId; //TODO: check using of User
+    private Long ownerId;
     //private Long menuId; //TODO: check using of Menu
 
-    private Restaurant(final Long id, final String name, final Address address, final KitchenType kitchenType, String openingHours, final Long ownerId) {
+    private Restaurant(final Long id, final String name, final Address address, final String kitchenType, String openingHours, final Long ownerId) {
         this.id = id;
         renameTo(name);
         updateAddress(address);
@@ -28,14 +27,14 @@ public class Restaurant {
     public static Restaurant newRestaurant(final Long id,
                                            final String name,
                                            final Address address,
-                                           final KitchenType kitchenType,
+                                           final String kitchenType,
                                            final String openingHours,
                                            final Long ownerId) {
 
         return new Restaurant(id, name, address, kitchenType, openingHours, ownerId);
     }
 
-    public void update(String name, Address address, KitchenType kitchenType, String openingHours) {
+    public void update(String name, Address address, String kitchenType, String openingHours) {
         if(name != null){
             renameTo(name);
         }
@@ -64,19 +63,13 @@ public class Restaurant {
         this.address = newAddress;
     }
 
-    private void changeKitchenType(KitchenType newKitchenType) {
-        if(newKitchenType == null)
+    private void changeKitchenType(String newKitchenType) {
+        if(newKitchenType == null || newKitchenType.isBlank())
             throw new DomainException("You need to inform the restaurant kitchen type!");
 
-        this.kitchenType = newKitchenType;
+        this.kitchenType = KitchenType.from(newKitchenType);
     }
 
-//    private void changeOpeningHours(WeeklySchedule businessHours) {
-//        if(businessHours == null)
-//            throw new DomainException("You need to inform the restaurant opening hours!");
-//
-//        this.openingHours = businessHours;
-//    }
     private void changeOpeningHours(String newOpeningHours) {
         if(newOpeningHours == null || newOpeningHours.isBlank())
             throw new DomainException("You need to inform the restaurant opening hours!");

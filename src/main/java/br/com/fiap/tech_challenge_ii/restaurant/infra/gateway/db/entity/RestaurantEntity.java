@@ -1,6 +1,5 @@
 package br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.entity;
 
-import br.com.fiap.tech_challenge_ii.restaurant.core.domain.KitchenType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,8 +28,7 @@ public class RestaurantEntity {
     private AddressEntity address;
 
     @Column(name ="kitchen_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private KitchenType kitchenType;
+    private String kitchenType;
 
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;

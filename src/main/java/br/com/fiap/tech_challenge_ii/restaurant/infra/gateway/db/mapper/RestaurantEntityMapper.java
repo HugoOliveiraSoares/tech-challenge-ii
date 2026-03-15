@@ -14,13 +14,12 @@ public class RestaurantEntityMapper {
         }
 
         var restaurantEntity = new RestaurantEntity();
-        if(restaurant.getId() != null) {
-            restaurantEntity.setId(restaurant.getId());
-        }
+
+        restaurantEntity.setId(restaurant.getId());
         restaurantEntity.setName(restaurant.getName());
         restaurantEntity.setOpeningHours(restaurant.getOpeningHours());
         restaurantEntity.setAddress(toEntity(restaurant.getAddress()));
-        restaurantEntity.setKitchenType(restaurant.getKitchenType());
+        restaurantEntity.setKitchenType(restaurant.getKitchenType().name());
         restaurantEntity.setOwnerId(restaurant.getOwnerId());
 
         return restaurantEntity;

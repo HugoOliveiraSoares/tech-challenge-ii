@@ -4,6 +4,5 @@ public record CreateRestaurantInput(String name,
                                     AddressDTO address,
                                     String kitchenType,
 //                                    WeeklyScheduleDTO weeklyScheduleDTO,
-                                    String openingHours,
-                                    Long ownerId) {
+                                    String openingHours) {
 }

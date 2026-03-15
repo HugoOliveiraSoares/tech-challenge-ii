@@ -5,7 +5,7 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.*;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.*;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.mapper.RestaurantControllerMapper;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +13,8 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/restaurants")
-@AllArgsConstructor
 public class RestaurantController {
     private final CreateRestaurant createRestaurant;
     private final GetRestaurantById getRestaurantById;
@@ -50,20 +50,20 @@ public class RestaurantController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UpdateRestaurantResponse> update(@PathVariable("id") Long restaurantId,
+    public ResponseEntity<UpdateRestaurantResponse> update(@RequestHeader("x-user-id") Long loggedUserId,
+                                                           @PathVariable("id") Long restaurantId,
                                                            @Valid @RequestBody UpdateRestaurantRequest input){
-        //TODO: Get loggedUserId from JWT when Spring Security is implemented
-        Long loggedUserId = 1L;
+
         var updatedRestaurant = updateRestaurant.update(loggedUserId, restaurantId, mapper.toInput(input));
 
         return ResponseEntity.ok(mapper.toResponse(updatedRestaurant));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable("id") Long restaurantId){
-        //TODO: Get loggedUserId from JWT token
-        Long loggedUserId = 1L; //temporary
-        deleteRestaurantById.deleteById(loggedUserId, restaurantId);
+    public ResponseEntity<Void> deleteById(@RequestHeader("x-user-id") Long id,
+            @PathVariable("id") Long restaurantId){
+
+        deleteRestaurantById.deleteById(id, restaurantId);
 
         return ResponseEntity.noContent().build();
     }
