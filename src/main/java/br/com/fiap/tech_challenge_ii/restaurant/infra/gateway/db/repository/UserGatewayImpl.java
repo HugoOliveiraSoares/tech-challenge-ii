@@ -1,6 +1,6 @@
 package br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.repository;
 
-import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.UserOwner;
+import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.User;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.UserGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.gateway.db.mapper.UserEntityMapper;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ public class UserGatewayImpl implements UserGateway {
     private final UserEntityMapper mapper;
 
     @Override
-    public Optional<UserOwner> getUserById(Long id) {
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id)
                 .map(mapper::toDomain);
     }
