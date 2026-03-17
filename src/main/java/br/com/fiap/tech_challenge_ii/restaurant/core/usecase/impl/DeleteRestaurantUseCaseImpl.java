@@ -3,12 +3,12 @@ package br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl;
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.RestaurantNotFoundException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UnauthorizedOperationException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.DeleteRestaurantById;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.DeleteRestaurantUseCase;
 
-public class DeleteRestaurantByIdImpl implements DeleteRestaurantById {
+public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
     private final RestaurantGateway restaurantGateway;
 
-    public DeleteRestaurantByIdImpl(RestaurantGateway restaurantGateway) {
+    public DeleteRestaurantUseCaseImpl(RestaurantGateway restaurantGateway) {
         this.restaurantGateway = restaurantGateway;
     }
 
