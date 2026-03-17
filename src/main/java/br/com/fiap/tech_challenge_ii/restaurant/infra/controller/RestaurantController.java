@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("/restaurants")
 public class RestaurantController {
     private final CreateRestaurantUseCase createRestaurant;
-    private final GetRestaurantById getRestaurantById;
-    private final ListRestaurants listRestaurants;
-    private final UpdateRestaurant updateRestaurant;
+    private final GetRestaurantByIdUseCase getRestaurantByIdUseCase;
+    private final ListRestaurantsUseCase listRestaurantsUseCase;
+    private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private final DeleteRestaurantUseCase deleteRestaurantById;
     private final RestaurantControllerMapper mapper;
 
@@ -34,7 +34,7 @@ public class RestaurantController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GetRestaurantResponse> getById(@PathVariable Long id){
-        var restaurant = getRestaurantById.getById(id);
+        var restaurant = getRestaurantByIdUseCase.getById(id);
 
         return ResponseEntity.ok(mapper.toResponse(restaurant));
     }
@@ -42,7 +42,7 @@ public class RestaurantController {
     @GetMapping
     public ResponseEntity<List<ListRestaurantResponse>> listAll(@RequestParam(name = "name", required = false) String name){
         var filter = new RestaurantSearchFilter(name != null ? name : "");
-        var response = listRestaurants.list(filter).stream()
+        var response = listRestaurantsUseCase.list(filter).stream()
                 .map(mapper::toResponse)
                 .toList();
 
@@ -54,7 +54,7 @@ public class RestaurantController {
                                                            @PathVariable("id") Long restaurantId,
                                                            @Valid @RequestBody UpdateRestaurantRequest input){
 
-        var updatedRestaurant = updateRestaurant.update(loggedUserId, restaurantId, mapper.toInput(input));
+        var updatedRestaurant = updateRestaurantUseCase.update(loggedUserId, restaurantId, mapper.toInput(input));
 
         return ResponseEntity.ok(mapper.toResponse(updatedRestaurant));
     }

@@ -15,13 +15,13 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public GetRestaurantById getRestaurantById(RestaurantGateway gateway) {
-        return new GetRestaurantByIdImpl(gateway);
+    public GetRestaurantByIdUseCase getRestaurantById(RestaurantGateway gateway) {
+        return new GetRestaurantByIdUseCaseImpl(gateway);
     }
 
     @Bean
-    public ListRestaurants listRestaurants(RestaurantGateway gateway) {
-        return new ListRestaurantsImpl(gateway);
+    public ListRestaurantsUseCase listRestaurants(RestaurantGateway gateway) {
+        return new ListRestaurantsUseCaseImpl(gateway);
     }
 
     @Bean
@@ -30,8 +30,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public UpdateRestaurant updateRestaurant(RestaurantGateway gateway) {
-        return new UpdateRestaurantImpl(gateway);
+    public UpdateRestaurantUseCase updateRestaurant(RestaurantGateway gateway) {
+        return new UpdateRestaurantUseCaseImpl(gateway);
     }
 
 }

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
+
     private final RestaurantGateway restaurantGateway;
     private final UserGateway userGateway;
 

@@ -6,12 +6,12 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.dto.UpdateRestaurantOutput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.RestaurantNotFoundException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UnauthorizedOperationException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.UpdateRestaurant;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.UpdateRestaurantUseCase;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.UpdateRestaurantOutputMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class UpdateRestaurantImpl implements UpdateRestaurant {
+public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
     private final RestaurantGateway restaurantGateway;
 
     @Override

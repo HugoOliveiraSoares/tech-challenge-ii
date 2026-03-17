@@ -5,6 +5,6 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.filter.RestaurantSe
 
 import java.util.List;
 
-public interface ListRestaurants {
+public interface ListRestaurantsUseCase {
     List<ListRestaurantOutput> list(RestaurantSearchFilter filter);
 }
