@@ -8,12 +8,12 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UnauthorizedOpera
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UserNotFoundException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.UserGateway;
-import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurant;
+import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.CreateRestaurantUseCase;
 import br.com.fiap.tech_challenge_ii.restaurant.core.usecase.mapper.CreateRestaurantOutputMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CreateRestaurantImpl implements CreateRestaurant {
+public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
     private final RestaurantGateway restaurantGateway;
     private final UserGateway userGateway;
 

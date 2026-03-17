@@ -16,11 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/restaurants")
 public class RestaurantController {
-    private final CreateRestaurant createRestaurant;
+    private final CreateRestaurantUseCase createRestaurant;
     private final GetRestaurantById getRestaurantById;
     private final ListRestaurants listRestaurants;
     private final UpdateRestaurant updateRestaurant;
-    private final DeleteRestaurantById deleteRestaurantById;
+    private final DeleteRestaurantUseCase deleteRestaurantById;
     private final RestaurantControllerMapper mapper;
 
     @PostMapping

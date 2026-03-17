@@ -2,12 +2,12 @@ package br.com.fiap.tech_challenge_ii.restaurant.core.usecase.impl;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.Restaurant;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.User;
-import br.com.fiap.tech_challenge_ii.restaurant.core.dto.AddressDTO;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UnauthorizedOperationException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.UserNotFoundException;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.tech_challenge_ii.restaurant.core.gateway.UserGateway;
+import br.com.fiap.tech_challenge_ii.restaurant.helper.RestaurantHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.Address.newAddress;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -31,41 +30,16 @@ class CreateRestaurantUseCaseImplTest {
     private UserGateway userGateway;
 
     @InjectMocks
-    private CreateRestaurantImpl createRestaurant;
+    private CreateRestaurantUseCaseImpl createRestaurant;
 
     @Test
     void create_shouldCreateRestaurant_whenUserTypeIsOwner() {
 
-        CreateRestaurantInput json = new CreateRestaurantInput(
-                "Bean Pizza",
-                new AddressDTO(
-                        1L,
-                        "Av. Rosa e Silva",
-                        "1000",
-                        "Aflitos",
-                        "Recife",
-                        "50000-000"
-                ),
-                "Italian",
-                "seg-sex: 16:00-22:59, dom: 11:00-21:59"
-        );
+        CreateRestaurantInput json = RestaurantHelper.buildCreateRestaurantInput();
 
-        User userOwner = new User(1L,"owner");
+        User userOwner = RestaurantHelper.buildOwner();
 
-        Restaurant restaurant = Restaurant.newRestaurant(
-                1L,
-                "Bean Pizza",
-                newAddress(1L,
-                        "Av. Rosa e Silva",
-                        "1000",
-                        "Aflitos",
-                        "Recife",
-                        "50000-000"
-                ),
-                "Italian",
-                "seg-sex: 16:00-22:59, dom: 11:00-21:59",
-                1L
-        );
+        Restaurant restaurant = RestaurantHelper.buildRestaurant();
 
         when(userGateway.getUserById(1L))
                 .thenReturn(Optional.of(userOwner));
@@ -87,19 +61,7 @@ class CreateRestaurantUseCaseImplTest {
 
     @Test
     void create_shouldThrowUserNotFoundException_whenUserNotFound(){
-        CreateRestaurantInput json = new CreateRestaurantInput(
-                "Bean Pizza",
-                new AddressDTO(
-                        1L,
-                        "Av. Rosa e Silva",
-                        "1000",
-                        "Aflitos",
-                        "Recife",
-                        "50000-000"
-                ),
-                "Italian",
-                "seg-sex: 16:00-22:59, dom: 11:00-21:59"
-        );
+        CreateRestaurantInput json = RestaurantHelper.buildCreateRestaurantInput();
 
         when(userGateway.getUserById(2L))
                 .thenReturn(Optional.empty());
@@ -117,21 +79,9 @@ class CreateRestaurantUseCaseImplTest {
 
     @Test
     void create_shouldThrowUnauthorizedOperationException_whenUserTypeIsNotOwner() {
-        CreateRestaurantInput json = new CreateRestaurantInput(
-                "Bean Pizza",
-                new AddressDTO(
-                        1L,
-                        "Av. Rosa e Silva",
-                        "1000",
-                        "Aflitos",
-                        "Recife",
-                        "50000-000"
-                ),
-                "Italian",
-                "seg-sex: 16:00-22:59, dom: 11:00-21:59"
-        );
+        CreateRestaurantInput json = RestaurantHelper.buildCreateRestaurantInput();
 
-        User userCustomer = new User(2L,"customer");
+        User userCustomer = RestaurantHelper.buildCustomer();
 
         when(userGateway.getUserById(2L))
                 .thenReturn(Optional.of(userCustomer));

@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UseCaseConfig {
     @Bean
-    public CreateRestaurant createRestaurant(RestaurantGateway gateway, UserGateway userGateway) {
-        return new CreateRestaurantImpl(gateway, userGateway);
+    public CreateRestaurantUseCase createRestaurant(RestaurantGateway gateway, UserGateway userGateway) {
+        return new CreateRestaurantUseCaseImpl(gateway, userGateway);
     }
 
     @Bean
@@ -25,8 +25,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public DeleteRestaurantById deleteRestaurantById(RestaurantGateway gateway) {
-        return new DeleteRestaurantByIdImpl(gateway);
+    public DeleteRestaurantUseCase deleteRestaurantById(RestaurantGateway gateway) {
+        return new DeleteRestaurantUseCaseImpl(gateway);
     }
 
     @Bean
