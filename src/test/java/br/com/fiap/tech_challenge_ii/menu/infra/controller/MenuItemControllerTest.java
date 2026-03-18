@@ -20,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.jdbc.SqlConfig.TransactionMode;
+import org.springframework.test.context.transaction.AfterTransaction;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +31,7 @@ import br.com.fiap.tech_challenge_ii.menu.infra.controller.dto.UpdateMenuItemReq
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 @Sql(scripts = "/sql/menu.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS, config = @SqlConfig(transactionMode = TransactionMode.ISOLATED))
 public class MenuItemControllerTest {
     @Autowired
@@ -56,11 +59,11 @@ public class MenuItemControllerTest {
     void shouldCreateMenuItems() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
                 new MenuItemRequestDTO("Picanha", "Delicious beef", new BigDecimal("59.90"), false,
-                        "/images/picanha.jpg", 1L),
+                        "/images/picanha.jpg"),
                 new MenuItemRequestDTO("Suco de Laranja", "Fresh orange juice", new BigDecimal("12.00"), false,
-                        "/images/suco.jpg", 1L));
+                        "/images/suco.jpg"));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
@@ -73,9 +76,9 @@ public class MenuItemControllerTest {
     void shouldReturnForbiddenWhenNotOwner() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
                 new MenuItemRequestDTO("Picanha", "Delicious beef", new BigDecimal("59.90"), false,
-                        "/images/picanha.jpg", 1L));
+                        "/images/picanha.jpg"));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .header("x-user-id", 2L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
@@ -87,9 +90,9 @@ public class MenuItemControllerTest {
     void shouldReturnBadRequestForMissingUserId() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
                 new MenuItemRequestDTO("Picanha", "Delicious beef", new BigDecimal("59.90"), false,
-                        "/images/picanha.jpg", 1L));
+                        "/images/picanha.jpg"));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
                 .andDo(print())
@@ -99,9 +102,9 @@ public class MenuItemControllerTest {
     @Test
     void shouldReturnBadRequestForMissingName() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
-                new MenuItemRequestDTO("", "Description", new BigDecimal("10.00"), false, null, 1L));
+                new MenuItemRequestDTO("", "Description", new BigDecimal("10.00"), false, null));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
@@ -112,9 +115,9 @@ public class MenuItemControllerTest {
     @Test
     void shouldReturnBadRequestForMissingPrice() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
-                new MenuItemRequestDTO("Test Item", "Description", null, false, null, 1L));
+                new MenuItemRequestDTO("Test Item", "Description", null, false, null));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
@@ -125,9 +128,9 @@ public class MenuItemControllerTest {
     @Test
     void shouldReturnBadRequestForNegativePrice() throws Exception {
         List<MenuItemRequestDTO> items = List.of(
-                new MenuItemRequestDTO("Test Item", "Description", new BigDecimal("-10.00"), false, null, 1L));
+                new MenuItemRequestDTO("Test Item", "Description", new BigDecimal("-10.00"), false, null));
 
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(items)))
@@ -137,23 +140,14 @@ public class MenuItemControllerTest {
 
     @Test
     void shouldReturnBadRequestForDuplicateItem() throws Exception {
-        mockMvc.perform(post("/menu")
+        mockMvc.perform(post("/menu/1")
                 .header("x-user-id", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
-                        "[{\"name\":\"Feijoada\",\"description\":\"Traditional dish\",\"price\":45.90,\"isOnlyLocalConsuption\":false,\"photoPath\":null,\"restaurantId\":1}]"))
+                        "[{\"name\":\"Feijoada\",\"description\":\"Traditional dish\",\"price\":45.90,\"isOnlyLocalConsuption\":false,\"photoPath\":null}]"))
                 .andDo(print())
-                .andExpect(result -> {
-                    int status = result.getResponse().getStatus();
-                    if (status == 400) {
-                        org.hamcrest.MatcherAssert.assertThat(result.getResponse().getContentAsString(),
-                                org.hamcrest.CoreMatchers.containsString("Item with name 'Feijoada' already exists"));
-                    } else if (status == 500) {
-                        // Database state issue - test passes for coverage purposes
-                    } else {
-                        throw new AssertionError("Unexpected status: " + status);
-                    }
-                });
+                .andExpect(status().isBadRequest());
+
     }
 
     @Test
