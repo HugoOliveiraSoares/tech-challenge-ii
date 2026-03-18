@@ -44,7 +44,8 @@ class CreateRestaurantUseCaseImplTest {
         when(userGateway.getUserById(1L))
                 .thenReturn(Optional.of(userOwner));
 
-        when(restaurantGateway.create(any(Restaurant.class))).thenReturn(restaurant);
+        when(restaurantGateway.create(any(Restaurant.class)))
+                .thenReturn(restaurant);
 
         var output = createRestaurant.create(1L, json);
 

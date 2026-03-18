@@ -5,6 +5,8 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.User;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.AddressDTO;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
 
+import java.util.List;
+
 import static br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.Address.newAddress;
 
 public class RestaurantHelper {
@@ -20,7 +22,7 @@ public class RestaurantHelper {
                         "50000-000"
                 ),
                 "Italian",
-                "seg-sex: 16:00-22:59, dom: 11:00-21:59"
+                "seg-sex: 16:00-22:59, sab-dom: 11:00-21:59"
         );
     }
 
@@ -36,9 +38,42 @@ public class RestaurantHelper {
                         "50000-000"
                 ),
                 "Italian",
-                "seg-sex: 16:00-22:59, dom: 11:00-21:59",
+                "seg-sex: 16:00-22:59, sab-dom: 11:00-21:59",
                 1L
         );
+    }
+
+    public static List<Restaurant> buildListOfRestaurants(){
+        Restaurant restaurant1 = Restaurant.newRestaurant(
+                1L,
+                "Bean Pizza",
+                newAddress(1L,
+                        "Av. Rosa e Silva",
+                        "1000",
+                        "Aflitos",
+                        "Recife",
+                        "50000-000"
+                ),
+                "Italian",
+                "seg-sex: 16:00-22:59, sab-dom: 11:00-21:59",
+                1L
+        );
+
+        Restaurant restaurant2 = Restaurant.newRestaurant(
+                2L,
+                "Java Cafe",
+                newAddress(1L,
+                        "Av. Rosa e Silva",
+                        "1150",
+                        "Aflitos",
+                        "Recife",
+                        "50000-000"
+                ),
+                "Brazilian",
+                "seg-sex: 07:00-20:59, sab-dom: 8:00-20:59",
+                1L
+        );
+        return List.of(restaurant1, restaurant2);
     }
 
     public static User buildOwner(){
