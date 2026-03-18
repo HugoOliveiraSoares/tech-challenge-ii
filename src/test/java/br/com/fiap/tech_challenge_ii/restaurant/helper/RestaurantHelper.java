@@ -1,9 +1,11 @@
 package br.com.fiap.tech_challenge_ii.restaurant.helper;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.Restaurant;
+import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.Address;
 import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.User;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.AddressDTO;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
+import br.com.fiap.tech_challenge_ii.restaurant.core.dto.UpdateRestaurantInput;
 
 import java.util.List;
 
@@ -76,6 +78,40 @@ public class RestaurantHelper {
         return List.of(restaurant1, restaurant2);
     }
 
+    public static UpdateRestaurantInput buildUpdateRestaurantInput() {
+        return new UpdateRestaurantInput(
+                "updated-name",
+                new AddressDTO(
+                        2L,
+                        "updated-street-name",
+                        "updated-number",
+                        "updated-neighborhood",
+                        "updated-city",
+                        "updated-zip-code"
+                ),
+                "BRAZILIAN",
+                "updated-openingHours"
+        );
+    }
+
+    public static Restaurant buildUpdatedRestaurant() {
+        return Restaurant.newRestaurant(
+                1L,
+                "updated-name",
+                Address.newAddress(
+                        2L,
+                        "updated-street-name",
+                        "updated-number",
+                        "updated-neighborhood",
+                        "updated-city",
+                        "updated-zip-code"
+                ),
+                "BRAZILIAN",
+                "updated-openingHours",
+                1L
+        );
+    }
+
     public static User buildOwner(){
         return new User(1L,"owner");
     }
@@ -83,4 +119,5 @@ public class RestaurantHelper {
     public static User buildCustomer(){
         return new User(2L,"customer");
     }
+
 }

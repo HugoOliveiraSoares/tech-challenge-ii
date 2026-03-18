@@ -22,7 +22,7 @@ public enum KitchenType {
         try{
             return KitchenType.valueOf(kitchenType.trim().toUpperCase());
         }catch(IllegalArgumentException e){
-            throw new DomainException("Invalid Kitchen Type: " + kitchenType);
+            throw new DomainException("Invalid kitchen type value: " + kitchenType);
         }
     }
 }
