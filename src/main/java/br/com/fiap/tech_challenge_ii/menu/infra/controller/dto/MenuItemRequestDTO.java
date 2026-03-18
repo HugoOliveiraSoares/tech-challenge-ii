@@ -15,7 +15,5 @@ public record MenuItemRequestDTO(
 
         boolean isOnlyLocalConsuption,
 
-        String photoPath,
-
-        @NotNull(message = "Restaurant ID is required") @Positive(message = "Restaurant ID must be positive") Long restaurantId) {
+        String photoPath) {
 }

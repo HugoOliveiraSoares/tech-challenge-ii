@@ -37,9 +37,10 @@ public class MenuItemController {
     private final DeleteMenuItemUseCase deleteMenuItemUseCase;
     private final UpdateMenuItemUseCase updateMenuItemUseCase;
 
-    @PostMapping
+    @PostMapping("/{restaurantId}")
     public ResponseEntity<Map<String, List<Long>>> createMenuItems(
             @RequestHeader("x-user-id") Long userId,
+            @PathVariable Long restaurantId,
             @Valid @RequestBody List<MenuItemRequestDTO> menuItems) {
 
         List<MenuItemDTO> menuItemDTOs = menuItems.stream()
@@ -49,7 +50,7 @@ public class MenuItemController {
                         req.price(),
                         req.isOnlyLocalConsuption(),
                         req.photoPath(),
-                        req.restaurantId()))
+                        restaurantId))
                 .toList();
 
         List<Long> ids = createMenuItemUseCase.save(menuItemDTOs, userId);
