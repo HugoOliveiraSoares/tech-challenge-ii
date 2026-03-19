@@ -6,6 +6,8 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.domain.valueObjects.User;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.AddressDTO;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.UpdateRestaurantInput;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.AddressJson;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
 
 import java.util.List;
 
@@ -120,4 +122,16 @@ public class RestaurantHelper {
         return new User(2L,"customer");
     }
 
+    public static CreateRestaurantRequest buildCreateRestaurantRequest() {
+        return new CreateRestaurantRequest("any-name",
+                new AddressJson(null,
+                        "any-street-name",
+                        "any-number",
+                        "any-neighborhood",
+                        "any-city",
+                        "any-zip-code"),
+                "Italian",
+                "any-opening-hours"
+        );
+    }
 }
