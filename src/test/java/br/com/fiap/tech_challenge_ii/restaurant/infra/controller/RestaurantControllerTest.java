@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -60,7 +61,8 @@ class RestaurantControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("There is no user with id 900"));
     }
 
     @Test
@@ -75,7 +77,8 @@ class RestaurantControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.detail").value("Only users with OWNER role can create restaurants"));
     }
 
     @Test
@@ -95,7 +98,64 @@ class RestaurantControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Validation failed"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/get-restaurant-setup.sql"},
+    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void get_shouldReturnARestaurant_whenIdIsValid() throws Exception {
+        mockMvc.perform(get("/restaurants/1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("any-restaurant-name"))
+                .andExpect(jsonPath("$.address.street").value("any-street-name"))
+                .andExpect(jsonPath("$.address.city").value("any-city"))
+                .andExpect(jsonPath("$.kitchenType").value("BRAZILIAN"))
+                .andExpect(jsonPath("$.openingHours").value("any-opening-hours"));
+    }
+
+    @Test
+    @Sql(scripts = "/sql/restaurant/clean-up.sql",
+    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void get_shouldReturnRestaurantNotFoundException_whenIdIsNotValid() throws Exception {
+        mockMvc.perform(get("/restaurants/999"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Restaurant not found"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/list-restaurants-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void list_shouldReturnAListOfRestaurants_whenThereAreRestaurants() throws Exception {
+        mockMvc.perform(get("/restaurants"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("first-restaurant-name"))
+                .andExpect(jsonPath("$[0].kitchenType").value("BRAZILIAN"))
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].name").value("second-restaurant-name"))
+                .andExpect(jsonPath("$[1].kitchenType").value("ITALIAN"));
+    }
+
+    @Test
+    @Sql(scripts = "/sql/restaurant/clean-up.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void list_shouldReturnEmptyList_whenThereAreNoRestaurants() throws Exception {
+        mockMvc.perform(get("/restaurants"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 }
 
