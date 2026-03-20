@@ -123,7 +123,7 @@ public class RestaurantHelper {
     }
 
     public static CreateRestaurantRequest buildCreateRestaurantRequest() {
-        return new CreateRestaurantRequest("any-name",
+        return new CreateRestaurantRequest("any-restaurant-name",
                 new AddressJson(null,
                         "any-street-name",
                         "any-number",

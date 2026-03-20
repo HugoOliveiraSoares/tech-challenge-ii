@@ -2,6 +2,7 @@ package br.com.fiap.tech_challenge_ii.restaurant.infra.controller;
 
 import br.com.fiap.tech_challenge_ii.restaurant.helper.RestaurantHelper;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.GetRestaurantResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,16 +38,26 @@ class RestaurantControllerTest {
     void create_shouldCreateRestaurant_whenUserTypeIsOwner() throws Exception {
         CreateRestaurantRequest request = RestaurantHelper.buildCreateRestaurantRequest();
 
-        mockMvc.perform(post("/restaurants")
+        var result = mockMvc.perform(post("/restaurants")
                     .header("x-user-id", 200L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.name").value("any-name"))
+                .andExpect(jsonPath("$.name").value("any-restaurant-name"))
                 .andExpect(jsonPath("$.kitchenType").value("ITALIAN"))
-                .andExpect(header().string("Location", Matchers.matchesPattern("/restaurants/\\d+")));
+                .andExpect(header().string("Location", Matchers.matchesPattern("/restaurants/\\d+")))
+                .andReturn();
+
+        var responseBody = result.getResponse().getContentAsString();
+        GetRestaurantResponse restaurantResponse = objectMapper.readValue(responseBody, GetRestaurantResponse.class);
+        Long id = restaurantResponse.id();
+
+        mockMvc.perform(get("/restaurants/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("any-restaurant-name"))
+                .andExpect(jsonPath("$.kitchenType").value("ITALIAN"));
     }
 
     @Test
@@ -94,9 +104,9 @@ class RestaurantControllerTest {
         );
 
         mockMvc.perform(post("/restaurants")
-                .header("x-user-id", 200L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
+                    .header("x-user-id", 200L)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Validation failed"));
@@ -104,7 +114,7 @@ class RestaurantControllerTest {
 
     @Test
     @Sql(scripts = {"/sql/restaurant/clean-up.sql",
-            "/sql/restaurant/get-restaurant-setup.sql"},
+            "/sql/restaurant/restaurant-setup.sql"},
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void get_shouldReturnARestaurant_whenIdIsValid() throws Exception {
         mockMvc.perform(get("/restaurants/1"))
@@ -121,7 +131,7 @@ class RestaurantControllerTest {
     @Test
     @Sql(scripts = "/sql/restaurant/clean-up.sql",
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void get_shouldReturnRestaurantNotFoundException_whenIdIsNotValid() throws Exception {
+    void get_shouldThrowRestaurantNotFoundException_whenRestaurantIdIsNotValid() throws Exception {
         mockMvc.perform(get("/restaurants/999"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -157,5 +167,48 @@ class RestaurantControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/delete-restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void delete_shouldDeleteRestaurant_whenIdIsValidAndUserIsOwner() throws Exception {
+        mockMvc.perform(delete("/restaurants/1")
+                        .header("x-user-id", 200)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/restaurants/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Restaurant not found"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/delete-restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void delete_shouldThrowRestaurantNotFoundException_whenRestaurantIdIsNotValid() throws Exception {
+        mockMvc.perform(delete("/restaurants/999")
+                    .header("x-user-id", 200)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Restaurant not found"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/delete-restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void delete_shouldThrowUnauthorizedOperationException_whenUserIsNotOwner() throws Exception {
+        mockMvc.perform(delete("/restaurants/1")
+                    .header("x-user-id", 2)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.detail").value("User not authorized to delete this restaurant"));
+    }
 }
+
 
