@@ -8,6 +8,7 @@ import br.com.fiap.tech_challenge_ii.restaurant.core.dto.CreateRestaurantInput;
 import br.com.fiap.tech_challenge_ii.restaurant.core.dto.UpdateRestaurantInput;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.AddressJson;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.UpdateRestaurantRequest;
 
 import java.util.List;
 
@@ -132,6 +133,22 @@ public class RestaurantHelper {
                         "any-zip-code"),
                 "Italian",
                 "any-opening-hours"
+        );
+    }
+
+    public static UpdateRestaurantRequest buildUpdateRestaurantRequest() {
+        return new UpdateRestaurantRequest(
+                "updated-restaurant-name",
+                new AddressJson(
+                        null,
+                        "updated-street",
+                        "updated-number",
+                        "updated-neighborhood",
+                        "updated-city",
+                        "updated-zip-code"
+                ),
+                "Mexican",
+                "updated-opening-hours"
         );
     }
 }

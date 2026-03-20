@@ -1,8 +1,10 @@
 package br.com.fiap.tech_challenge_ii.restaurant.infra.controller;
 
 import br.com.fiap.tech_challenge_ii.restaurant.helper.RestaurantHelper;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.AddressJson;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.CreateRestaurantRequest;
 import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.GetRestaurantResponse;
+import br.com.fiap.tech_challenge_ii.restaurant.infra.controller.json.UpdateRestaurantRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -170,7 +172,7 @@ class RestaurantControllerTest {
 
     @Test
     @Sql(scripts = {"/sql/restaurant/clean-up.sql",
-            "/sql/restaurant/delete-restaurant-setup.sql"},
+            "/sql/restaurant/restaurant-setup.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_shouldDeleteRestaurant_whenIdIsValidAndUserIsOwner() throws Exception {
         mockMvc.perform(delete("/restaurants/1")
@@ -186,7 +188,7 @@ class RestaurantControllerTest {
 
     @Test
     @Sql(scripts = {"/sql/restaurant/clean-up.sql",
-            "/sql/restaurant/delete-restaurant-setup.sql"},
+            "/sql/restaurant/restaurant-setup.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_shouldThrowRestaurantNotFoundException_whenRestaurantIdIsNotValid() throws Exception {
         mockMvc.perform(delete("/restaurants/999")
@@ -199,7 +201,7 @@ class RestaurantControllerTest {
 
     @Test
     @Sql(scripts = {"/sql/restaurant/clean-up.sql",
-            "/sql/restaurant/delete-restaurant-setup.sql"},
+            "/sql/restaurant/restaurant-setup.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_shouldThrowUnauthorizedOperationException_whenUserIsNotOwner() throws Exception {
         mockMvc.perform(delete("/restaurants/1")
@@ -208,6 +210,110 @@ class RestaurantControllerTest {
                 .andDo(print())
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.detail").value("User not authorized to delete this restaurant"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void patch_shouldUpdateRestaurant_whenDataIsValidAndUserIsOwner() throws Exception {
+        UpdateRestaurantRequest updateRestaurantRequest = RestaurantHelper.buildUpdateRestaurantRequest();
+
+        mockMvc.perform(patch("/restaurants/1")
+                        .header("x-user-id", 200)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRestaurantRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("updated-restaurant-name"))
+                .andExpect(jsonPath("$.address.street").value("updated-street"))
+                .andExpect(jsonPath("$.address.neighborhood").value("updated-neighborhood"))
+                .andExpect(jsonPath("$.address.city").value("updated-city"))
+                .andExpect(jsonPath("$.kitchenType").value("MEXICAN"))
+                .andExpect(jsonPath("$.openingHours").value("updated-opening-hours"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void patch_shouldThrowRestaurantNotFoundException_whenRestaurantNotFound() throws Exception {
+        UpdateRestaurantRequest updateRestaurantRequest = RestaurantHelper.buildUpdateRestaurantRequest();
+
+        mockMvc.perform(patch("/restaurants/999")
+                    .header("x-user-id", 200)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateRestaurantRequest)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Restaurant not found"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void patch_shouldThrowUnauthorizedOperationException_whenUserIsNotOwner() throws Exception {
+        UpdateRestaurantRequest updateRestaurantRequest = RestaurantHelper.buildUpdateRestaurantRequest();
+
+        mockMvc.perform(patch("/restaurants/1")
+                        .header("x-user-id", 201)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRestaurantRequest)))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.detail").value("User not authorized to update this restaurant"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/restaurant-setup.sql"},
+    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void patch_shouldUpdatedOnlyOpeningHours_whenOnlyOpeningHoursIsProvided() throws Exception {
+        UpdateRestaurantRequest partialUpdateRequest = new UpdateRestaurantRequest(null,
+                null,
+                null,
+                "updated-opening-hours");
+
+        mockMvc.perform(patch("/restaurants/1")
+                    .header("x-user-id", 200)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(partialUpdateRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("any-restaurant-name"))
+                .andExpect(jsonPath("$.address.street").value("any-street-name"))
+                .andExpect(jsonPath("$.address.neighborhood").value("any-neighborhood"))
+                .andExpect(jsonPath("$.address.city").value("any-city"))
+                .andExpect(jsonPath("$.kitchenType").value("BRAZILIAN"))
+                .andExpect(jsonPath("$.openingHours").value("updated-opening-hours"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/restaurant/clean-up.sql",
+            "/sql/restaurant/restaurant-setup.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void patch_shouldThrowDomainException_whenKitchenTypeIsNotValid() throws Exception {
+        UpdateRestaurantRequest updateRestaurantRequest = new UpdateRestaurantRequest("updated-restaurant-name",
+                new AddressJson(
+                        null,
+                        "updated-street",
+                        "updated-number",
+                        "updated-neighborhood",
+                        "updated-city",
+                        "updated-zip-code"
+                ),
+                "Invalid-kitchen-type",
+                "updated-opening-hours");
+
+        mockMvc.perform(patch("/restaurants/1")
+                .header("x-user-id", 200)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRestaurantRequest)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Invalid kitchen type value: Invalid-kitchen-type"));
     }
 }
 
