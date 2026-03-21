@@ -2,9 +2,10 @@ package br.com.fiap.tech_challenge_ii.restaurant.infra.controller;
 
 import br.com.fiap.tech_challenge_ii.restaurant.core.exception.SystemBaseException;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -15,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice(basePackages = "br.com.fiap.tech_challenge_ii.restaurant")
+@Component("restaurantExceptionHandler")
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SystemBaseException.class)
     protected ResponseEntity<ProblemDetail> handleSystemBaseException(SystemBaseException ex, WebRequest request) {

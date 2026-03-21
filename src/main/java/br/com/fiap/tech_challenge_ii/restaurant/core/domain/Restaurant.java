@@ -13,7 +13,6 @@ public class Restaurant {
     private KitchenType kitchenType;
     private String openingHours;
     private Long ownerId;
-    //private Long menuId; //TODO: check using of Menu
 
     private Restaurant(final Long id, final String name, final Address address, final String kitchenType, String openingHours, final Long ownerId) {
         this.id = id;

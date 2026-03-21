@@ -13,8 +13,6 @@ public class GetRestaurantOutputMapper {
                 restaurant.getAddress().city(),
                 restaurant.getAddress().zipCode());
 
-//        WeeklyScheduleDTO weeklyScheduleDTO = WeeklyScheduleMapper.toDTO(restaurant.getOpeningHours());
-
         return new GetRestaurantOutput(restaurant.getId(),
                 restaurant.getName(),
                 addressDTO,
