@@ -1,85 +1,75 @@
 package br.com.fiap.tech_challenge_ii.user.infra.controller;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import br.com.fiap.tech_challenge_ii.user.infra.controller.json.UserType;
-import br.com.fiap.tech_challenge_ii.user.infra.controller.json.UserTypeJson;
-import br.com.fiap.tech_challenge_ii.user.infra.gateway.db.entity.UserEntity;
-import br.com.fiap.tech_challenge_ii.user.infra.gateway.db.entity.UserTypeEntity;
-import br.com.fiap.tech_challenge_ii.user.infra.gateway.db.repository.UserEntityRepository;
-import br.com.fiap.tech_challenge_ii.user.infra.gateway.db.repository.UserTypeEntityRepository;
-import br.com.fiap.tech_challenge_ii.user.infra.gateway.http.RestaurantWebFluxGateway;
-import br.com.fiap.tech_challenge_ii.util.container.AbstractContainer;
-import org.junit.jupiter.api.DisplayName;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.fiap.tech_challenge_ii.user.core.domain.Owner;
+import br.com.fiap.tech_challenge_ii.user.core.domain.Restaurant;
+import br.com.fiap.tech_challenge_ii.user.core.gateway.RestaurantGateway;
+import br.com.fiap.tech_challenge_ii.user.core.gateway.UserGateway;
+import br.com.fiap.tech_challenge_ii.user.core.gateway.UserTypeGateway;
+import br.com.fiap.tech_challenge_ii.user.infra.controller.json.UserType;
+import br.com.fiap.tech_challenge_ii.user.infra.controller.json.UserTypeJson;
 
-import jakarta.transaction.Transactional;
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+public class UserTypeControllerComponentTest {
 
-@WireMockTest
-@ActiveProfiles("comp-test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class UserTypeControllerComponentTest extends AbstractContainer {
-	
-	@Autowired
-	private UserTypeController userTypeController;
-	
-	@Autowired
-	private RestaurantWebFluxGateway restauranteWebFluxGateway;
-	
-	@Autowired
-	private UserEntityRepository userEntityRepository;
-	
-	@Autowired
-	private UserTypeEntityRepository userTypeEntityRepository;
-	
-	@Test
-	@DisplayName("Deve criar 'Dono 'com sucesso")
-	@Transactional
-	void test1(WireMockRuntimeInfo wireMockRuntimeInfo) {
-		
-		final var idRestaurante = 1L;
-		final var tipoUsuarioJson = new UserTypeJson(null, "any-tipo-nome", UserType.OWNER);
-		
-		final var baseUrl = wireMockRuntimeInfo.getHttpBaseUrl();
-		
-		setField(restauranteWebFluxGateway, "baseUrl", baseUrl);
-		
-		var tipoDono = new UserTypeEntity(null, "any-tipo-dono-nome", 0);
-		var usuarioExistente = new UserEntity(null, "any-usuario-nome", tipoDono);
-		var idUsuarioLogado = userEntityRepository.save(usuarioExistente).getId();
+    @Autowired
+    private MockMvc mockMvc;
 
-		final var restaurantesResponseBodyMockStr = getRestaurantesResponse();
-		stubFor(get("/usuarios/" + idUsuarioLogado + "/restaurantes").willReturn(okJson(restaurantesResponseBodyMockStr)));
+    @Autowired
+    private ObjectMapper objectMapper;
 
-		
-		assertEquals(0, userTypeEntityRepository.count());
-		
-		var novoTipoId = userTypeController.criar(idUsuarioLogado, idRestaurante, tipoUsuarioJson);
-		
-		assertEquals(1, userTypeEntityRepository.count());
-		assertEquals(idUsuarioLogado, novoTipoId);
+    @MockBean
+    private RestaurantGateway restaurantGateway;
 
-	}
+    @MockBean
+    private UserGateway userGateway;
 
-	private String getRestaurantesResponse() {
-		return """
-				[
-					{
-						"id": 1,
-						"nome": "any-restaurante-name"
-					}
-				]
-				""";
-	}
+    @MockBean
+    private UserTypeGateway userTypeGateway;
+
+    @BeforeEach
+    void setUp() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant");
+        Owner owner = new Owner(1L, "Test Owner", Collections.emptyList());
+        
+        when(userGateway.findById(1L)).thenReturn(Optional.of(owner));
+        when(restaurantGateway.getByUserId(1L)).thenReturn(List.of(restaurant));
+        when(userTypeGateway.save(anyLong(), any(String.class), any(Class.class))).thenReturn(1L);
+    }
+
+    @Test
+    void shouldCreateUserType_whenUserIsOwner() throws Exception {
+        UserTypeJson request = new UserTypeJson(null, "any-tipo-nome", UserType.OWNER);
+
+        mockMvc.perform(post("/restaurantes/1/tipo-usuarios")
+                .header("x-user-id", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }

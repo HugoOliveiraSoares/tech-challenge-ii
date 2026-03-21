@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Component("userEntitySpringDataGateway")
 @RequiredArgsConstructor
 public class UserSpringDataGateway implements UserGateway {
 	

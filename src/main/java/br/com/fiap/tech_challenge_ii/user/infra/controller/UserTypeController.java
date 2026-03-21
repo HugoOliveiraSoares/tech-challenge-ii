@@ -26,7 +26,7 @@ public class UserTypeController {
 	private final CreateUserTypeUseCase createUserTypeUseCase;
 	
 	@PostMapping("/restaurantes/{idRestaurante}/tipo-usuarios")
-	public Long criar(@RequestHeader("id-usuario-logado") Long loggedInUserId,  @PathVariable("idRestaurante") Long idRestaurant,  @RequestBody UserTypeJson userTypeJson) {
+	public Long criar(@RequestHeader("x-user-id") Long loggedInUserId, @PathVariable("idRestaurante") Long idRestaurant, @RequestBody UserTypeJson userTypeJson) {
 		
 		var nameType = userTypeJson.getName();
 		

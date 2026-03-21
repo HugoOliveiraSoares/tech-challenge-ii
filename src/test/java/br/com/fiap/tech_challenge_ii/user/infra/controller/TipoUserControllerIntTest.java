@@ -14,6 +14,7 @@ import br.com.fiap.tech_challenge_ii.user.core.domain.Client;
 import br.com.fiap.tech_challenge_ii.user.core.usecase.CreateUserTypeUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("controller-test")
 @WebMvcTest(UserTypeController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TipoUserControllerIntTest {
 	
 	@Autowired
@@ -45,9 +47,9 @@ class TipoUserControllerIntTest {
 					.content("""
 						{
 						    "nome": "any name",
-						    "tipo": "CLIENTE"
+						    "tipo": "CLIENT"
 						}""")
-					.header("id-usuario-logado", idUsuarioLogado)
+					.header("x-user-id", idUsuarioLogado)
 					.contentType(MediaType.APPLICATION_JSON))
 		.andDo(print())
 		.andExpect(status().isOk())
