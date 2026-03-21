@@ -34,23 +34,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(ex.getHttpStatus()).body(problemDetail);
     }
 
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Object> handleGeneralException(final Exception ex, final WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred");
-        problemDetail.setType(URI.create("https://api.example.com/errors/internal-server-error"));
-        problemDetail.setTitle("Internal Server Error");
-        problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
-        problemDetail.setProperty("timestamp", Instant.now().toString());
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
-    }
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
         List<Map<String, String>> invalidParams = ex.getBindingResult().getFieldErrors()
                 .stream()
                 .map(e -> {
