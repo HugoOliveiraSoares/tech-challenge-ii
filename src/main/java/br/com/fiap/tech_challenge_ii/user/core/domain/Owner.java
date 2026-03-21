@@ -1,29 +1,25 @@
 package br.com.fiap.tech_challenge_ii.user.core.domain;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import br.com.fiap.tech_challenge_ii.user.core.domain.Restaurant;
-import br.com.fiap.tech_challenge_ii.user.core.domain.valueObjects.Address;
+import lombok.Getter;
 
-
-
+@Getter
 public class Owner extends User {
 
-    List<Restaurant> restaurants;
+	private List<Restaurant> restaurants;
 
-    public Owner(Long id, String name, String email, String login, String password, LocalDateTime lastModifiedDate,
-            Address address, List<Restaurant> restaurants) {
-        super(id, name, email, login, password, lastModifiedDate, address);
-        this.restaurants = restaurants;
-    }
+	public Owner(Long id, String nameType, List<Restaurant> restaurants) {
+		super(id, nameType);
+		this.restaurants = restaurants;
+	}
 
-    public boolean isRestaurantOwner(Long restaurantId) {
-        return restaurants.stream().anyMatch(r -> r.getId().equals(restaurantId));
-    }
+	public boolean isOwner(Long idRestaurant) {
+		return restaurants.stream().anyMatch(r -> r.getId().equals(idRestaurant));
+	}
 
-    public void addRestaurants(List<Restaurant> restaurantes) {
-        this.restaurants.addAll(restaurantes);
-    }
+	public void addRestaurants(List<Restaurant> restaurants) {
+		this.restaurants = restaurants;
+	}
 
 }
