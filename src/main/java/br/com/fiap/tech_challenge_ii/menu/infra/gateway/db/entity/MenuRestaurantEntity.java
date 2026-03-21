@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "app_user")
+@Table(name = "restaurant")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class MenuRestaurantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +25,8 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
 
 }
