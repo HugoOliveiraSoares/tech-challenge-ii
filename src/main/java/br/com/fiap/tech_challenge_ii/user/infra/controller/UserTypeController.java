@@ -36,7 +36,7 @@ public class UserTypeController {
 	}
 
 	private Class<? extends User> map(UserTypeJson userTypeJson) {
-		
+
 		if(UserType.CLIENT.equals(userTypeJson.getType())) {
 			return Client.class;
 		}
