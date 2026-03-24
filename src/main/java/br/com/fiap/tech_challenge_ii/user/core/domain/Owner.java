@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
+@SuperBuilder
 public class Owner extends User {
 
     private List<Restaurant> restaurants;
@@ -18,14 +20,6 @@ public class Owner extends User {
     public Owner(Long id, String name, String nameType) {
         super(id, name, nameType);
         this.restaurants = new ArrayList<>();
-    }
-
-    public boolean isOwner(Long idRestaurant) {
-        return restaurants.stream().anyMatch(r -> r.getId().equals(idRestaurant));
-    }
-
-    public void addRestaurants(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
     }
 
 }

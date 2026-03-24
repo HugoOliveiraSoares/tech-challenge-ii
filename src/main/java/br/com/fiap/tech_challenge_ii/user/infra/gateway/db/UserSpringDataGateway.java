@@ -1,7 +1,10 @@
 package br.com.fiap.tech_challenge_ii.user.infra.gateway.db;
 
+import java.util.List;
 import java.util.Optional;
 
+import br.com.fiap.tech_challenge_ii.user.core.dto.CreateUserDTO;
+import br.com.fiap.tech_challenge_ii.user.infra.gateway.db.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import br.com.fiap.tech_challenge_ii.user.core.domain.Client;
@@ -45,6 +48,86 @@ public class UserSpringDataGateway implements UserGateway {
         userEntity.setName(updatedUser.getName());
         userEntity.setType(updatedUser.getUserType());
         userEntityRepository.save(userEntity);
+    }
+
+    @Override
+    public void delete(Long id) {
+        var userId = userEntityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        userEntityRepository.delete(userId);
+    }
+
+    @Override
+    public User save(User user) {
+        // Cria entidade diretamente do domain
+        UserEntity entity = new UserEntity();
+        entity.setId(user.getId());
+        entity.setName(user.getName());
+        entity.setEmail(user.getEmail());
+        entity.setType(user.getUserType());
+
+        UserEntity saved = userEntityRepository.save(entity);
+
+        // Reconstrói domain da entidade salva
+        return switch (saved.getType()) {
+            case "OWNER" -> Owner.builder()
+                    .id(saved.getId())
+                    .name(saved.getName())
+                    .email(saved.getEmail())
+                    .userType(saved.getType())
+                    .build();
+            case "CLIENT" -> Client.builder()
+                    .id(saved.getId())
+                    .name(saved.getName())
+                    .email(saved.getEmail())
+                    .userType(saved.getType())
+                    .build();
+            default -> throw new IllegalArgumentException("Tipo inválido: " + saved.getType());
+        };
+    }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return userEntityRepository.existsByEmail(email);
+    }
+
+    @Override
+    public User createFromDTO(CreateUserDTO dto) {
+
+        return switch (dto.type().toUpperCase()) {
+            case "OWNER" -> Owner.builder()
+                    .name(dto.name())
+                    .email(dto.email())
+                    .userType(dto.type())
+                    .build();
+            case "CLIENT" -> Client.builder()
+                    .name(dto.name())
+                    .email(dto.email())
+                    .userType(dto.type())
+                    .build();
+            default -> throw new IllegalArgumentException("Tipo inválido: " + dto.type());
+        };
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userEntityRepository.findAll().stream().map(this::toDomain).toList();
+    }
+
+
+    private User toDomain(UserEntity entity) {
+        return switch (entity.getType()) {
+            case "OWNER" -> Owner.builder()
+                    .id(entity.getId()).name(entity.getName())
+                    .email(entity.getEmail()).userType(entity.getType())
+                    .build();
+            case "CLIENT" -> Client.builder()
+                    .id(entity.getId()).name(entity.getName())
+                    .email(entity.getEmail()).userType(entity.getType())
+                    .build();
+            default -> throw new IllegalArgumentException("Tipo inválido: " + entity.getType());
+        };
     }
 
 }
