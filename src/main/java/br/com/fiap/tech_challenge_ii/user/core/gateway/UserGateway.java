@@ -6,6 +6,8 @@ import java.util.Optional;
 
 public interface UserGateway {
 
-	Optional<User> findById(Long loggedInUserId);
+    Optional<User> findById(Long loggedInUserId);
+
+    void update(User user);
 
 }

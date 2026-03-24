@@ -54,7 +54,7 @@ public class UserTypeControllerComponentTest {
     @BeforeEach
     void setUp() {
         Restaurant restaurant = new Restaurant(1L, "Test Restaurant");
-        Owner owner = new Owner(1L, "Test Owner", Collections.emptyList());
+        Owner owner = new Owner(1L, "Test Owner", "Owner", Collections.emptyList());
         
         when(userGateway.findById(1L)).thenReturn(Optional.of(owner));
         when(restaurantGateway.getByUserId(1L)).thenReturn(List.of(restaurant));
