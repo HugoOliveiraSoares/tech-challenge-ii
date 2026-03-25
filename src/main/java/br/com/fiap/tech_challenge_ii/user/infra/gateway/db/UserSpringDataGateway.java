@@ -7,6 +7,8 @@ import br.com.fiap.tech_challenge_ii.user.core.dto.CreateUserDTO;
 import br.com.fiap.tech_challenge_ii.user.infra.gateway.db.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
+import br.com.fiap.tech_challenge_ii.user.core.exception.UserNotFoundException;
+import br.com.fiap.tech_challenge_ii.user.infra.exception.UserTypeNotFoundException;
 import br.com.fiap.tech_challenge_ii.user.core.domain.Client;
 import br.com.fiap.tech_challenge_ii.user.core.domain.Owner;
 import br.com.fiap.tech_challenge_ii.user.core.domain.User;
@@ -29,11 +31,12 @@ public class UserSpringDataGateway implements UserGateway {
             var userEntity = userEntityOp.get();
             var name = userEntity.getName();
             var nameType = userEntity.getType();
+            var email = userEntity.getEmail();
 
             if (userEntity.isOwner()) {
-                return Optional.of(new Owner(loggedInUserId, name, nameType, null));
+                return Optional.of(new Owner(loggedInUserId, name, nameType, email, null));
             } else {
-                return Optional.of(new Client(loggedInUserId, name, nameType));
+                return Optional.of(new Client(loggedInUserId, name, nameType, email));
             }
         }
 
@@ -43,8 +46,7 @@ public class UserSpringDataGateway implements UserGateway {
     @Override
     public void update(User updatedUser) {
         var userEntity = userEntityRepository.findById(updatedUser.getId())
-                .orElseThrow(() -> new RuntimeException("User not found")); // TODO: Se quiser pode criar uma exception
-                                                                            // propria
+                .orElseThrow(() -> new UserNotFoundException());
         userEntity.setName(updatedUser.getName());
         userEntity.setType(updatedUser.getUserType());
         userEntityRepository.save(userEntity);
@@ -53,7 +55,7 @@ public class UserSpringDataGateway implements UserGateway {
     @Override
     public void delete(Long id) {
         var userId = userEntityRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException());
 
         userEntityRepository.delete(userId);
     }
@@ -83,7 +85,7 @@ public class UserSpringDataGateway implements UserGateway {
                     .email(saved.getEmail())
                     .userType(saved.getType())
                     .build();
-            default -> throw new IllegalArgumentException("Tipo inválido: " + saved.getType());
+            default -> throw new UserTypeNotFoundException();
         };
     }
 
@@ -99,14 +101,14 @@ public class UserSpringDataGateway implements UserGateway {
             case "OWNER" -> Owner.builder()
                     .name(dto.name())
                     .email(dto.email())
-                    .userType(dto.type())
+                    .userType(dto.type().toUpperCase())
                     .build();
             case "CLIENT" -> Client.builder()
                     .name(dto.name())
                     .email(dto.email())
-                    .userType(dto.type())
+                    .userType(dto.type().toUpperCase())
                     .build();
-            default -> throw new IllegalArgumentException("Tipo inválido: " + dto.type());
+            default -> throw new UserTypeNotFoundException();
         };
     }
 
@@ -114,7 +116,6 @@ public class UserSpringDataGateway implements UserGateway {
     public List<User> findAll() {
         return userEntityRepository.findAll().stream().map(this::toDomain).toList();
     }
-
 
     private User toDomain(UserEntity entity) {
         return switch (entity.getType()) {
@@ -126,7 +127,7 @@ public class UserSpringDataGateway implements UserGateway {
                     .id(entity.getId()).name(entity.getName())
                     .email(entity.getEmail()).userType(entity.getType())
                     .build();
-            default -> throw new IllegalArgumentException("Tipo inválido: " + entity.getType());
+            default -> throw new UserTypeNotFoundException();
         };
     }
 

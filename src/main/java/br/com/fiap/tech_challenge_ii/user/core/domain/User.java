@@ -1,6 +1,5 @@
 package br.com.fiap.tech_challenge_ii.user.core.domain;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -14,9 +13,10 @@ public abstract class User {
     protected String email;
     protected String userType;
 
-    protected User(Long id, String name, String nameType) {
+    protected User(Long id, String name, String email, String nameType) {
         this.id = id;
         this.name = name;
+        this.email = email;
         this.userType = nameType;
     }
 
